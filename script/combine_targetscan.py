@@ -46,6 +46,10 @@ df['mre_end'] = -1
 
 grouped = df.groupby('Transcript ID')
 def iter_mres(args):
+    '''
+    3 is added and subtracted to fix an issue with gencode annotation (vM3)
+    '''
+    annotation_fix = 3  # set to 0, when using a recent version of gencode annotation
     index, utr_start, utr_end, strand, threeputr_features = args
     # for index, row in group.iterrows():
     pos = 0
@@ -54,17 +58,17 @@ def iter_mres(args):
             within_feature = utr_start - pos
             within_feature_end = utr_end - pos
             if strand == '+':
-                return (index, tpu_start + within_feature, tpu_start + within_feature_end)
+                return (index, tpu_start + within_feature + annotation_fix, tpu_start + within_feature_end + annotation_fix)
             else:
-                return (index, tpu_end - within_feature_end, tpu_end - within_feature)
+                return (index, tpu_end - within_feature_end - annotation_fix, tpu_end - within_feature - annotation_fix)
         pos += tpu_len
     # if the position of the MRE is *after* the annotated 3pUTR, then just imaginary extend the last exon.
     # HOWEVER we return the value multiplied by -1, to be able to count it later
     try:
         if strand == '+':
-            return (index, tpu_end + (utr_start - pos), tpu_end + (utr_end - pos))
+            return (index, tpu_end + (utr_start - pos) + annotation_fix, tpu_end + (utr_end - pos) + annotation_fix)
         else:
-            return (index, tpu_start - (utr_end - pos), tpu_start - (utr_start - pos))
+            return (index, tpu_start - (utr_end - pos) - annotation_fix, tpu_start - (utr_start - pos) - annotation_fix)
     except NameError:
         return (index, -1, -1)
 
