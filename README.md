@@ -19,7 +19,7 @@ cd mesc-regulation
 ```
 
 
-By running `snakemake --snakefile import_supp_tables.snakefile` you can import Supplementary Tables as provided by the applications. This way, there is no need to rerun any NGS pipelines on raw (fastq) data files. Make sure to place all supplementary tables as well as the quantseq-read counts file from GEO in the `supp/` folder.
+By running `snakemake -j 4 --snakefile import_supptables.snakefile` you can import Supplementary Tables as provided by the applications. This way, there is no need to rerun any NGS pipelines on raw (fastq) data files. Make sure to place all supplementary tables as well as the quantseq-read counts file from GEO in the `supp/` folder.
 
 Note that the generation of all output files might take a substantial amount of time and RAM!
 

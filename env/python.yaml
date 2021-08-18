@@ -3,31 +3,31 @@ channels:
   - conda-forge
   - defaults
 dependencies:
-  - ipdb=0.13.7=pyhd8ed1ab_0
-  - pygenometracks=3.6=py_0
-  - pandas=1.2.3=py38h51da96c_0
-  - openpyxl=3.0.7=pyhd8ed1ab_0
-  - matplotlib=3.3.2=py38h578d9bd_1
-  - matplotlib-venn=0.11.6=pyh9f0ad1d_0
-  - numpy=1.21.0=py38h9894fe3_0
-  - scikit-learn=0.24.2=py38hdc147b9_0
-  - seaborn=0.11.1=hd8ed1ab_1
-  - gffutils=0.10.1=pyh864c0ab_1
-  - pip=21.1.2=pyhd8ed1ab_0
-  - pybedtools=0.8.2=py38h69e0bdc_1
-  - pybigwig=0.3.18=py38h5ebd311_1
-  - networkx=2.5.1=pyhd8ed1ab_0
-  - adjusttext=0.7.3.1=py_1
-  - modin=0.10.0=py38h578d9bd_0
-  - swifter=1.0.7=py38h578d9bd_0
-  - upsetplot=0.4.4=pyhd8ed1ab_0
-  - tqdm=4.61.1=pyhd8ed1ab_0
-  - snakemake=6.4.1=hdfd78af_0
-  - snakemake-minimal=6.4.1=pyhdfd78af_0
-  - xlsxwriter=1.4.3=pyhd8ed1ab_0
-  - openpyxl=3.0.7=pyhd8ed1ab_0
+  - ipdb==0.13.7
+  - pygenometracks==3.6
+  - pandas==1.2.3
+  - openpyxl==3.0.7
+  - matplotlib==3.3.2
+  - matplotlib-venn==0.11.6
+  - scikit-learn==0.24.2
+  - seaborn==0.11.1
+  - gffutils==0.10.1
+  - pybedtools==0.8.2
+  - pybigwig==0.3.18
+  - networkx==2.5.1
+  - adjusttext==0.7.3.1
+  - pip
+  - modin==0.9.1
+  - swifter==1.0.7
+  - xlsxwriter==1.4.3
+  - openpyxl==3.0.7
   - pyensembl==1.9.1
   - pip:
     - pipelinehelper==0.7.8
+    - tqdm==4.61.1
+    - numpy==1.21.0
+    - tqdm==4.61.1
+    - upsetplot==0.6.0
+    - snakemake==6.4.1
+    - pyxdg==0.27
     - "--editable=git+https://github.com/moritzschaefer/moritzsphd_pub.git#egg=moritzsphd"
-
