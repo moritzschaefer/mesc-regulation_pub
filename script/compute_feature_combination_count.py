@@ -35,19 +35,19 @@ try:
         'Mutant upregulation': lambda row: up_genes.get(row.name[0], False),
         'TargetScan score': lambda row: row['context++ score'] < snakemake.params['max_ts_score']
     }
+    selectors = {f: df.apply(filters[f], axis=1) for f in filters}
 
     index = pd.DataFrame(
-        columns=filters.keys(),
-        data=itertools.product(*([(0, 1)] * len(filters)))
+        columns=selectors.keys(),
+        data=itertools.product(*([(0, 1)] * len(selectors)))
     )
 
     filtered_dfs = {}
     def _apply_filters(binary):
-        # pythonic reduce
-        subdf = df.copy()
-
+        combined_selector = pd.Series(data=True, index=df.index)
         for f in binary.index[binary.astype(bool)]:  # only consider the filters that are true
-            subdf = subdf.loc[subdf.apply(filters[f], axis=1)]
+            combined_selector &= selectors[f]
+        subdf = df.loc[combined_selector].copy()
         if sum(binary) >= 3:
             # Scorify (0.0-1.0) our features
             score_df, _ = score(subdf, padj, log2fc)
@@ -68,7 +68,7 @@ try:
     writer = pd.ExcelWriter(snakemake.output['interactions'], engine='xlsxwriter')
     for i, (filter_name, filtered_df) in enumerate(filtered_dfs.items()):
         filtered_df.reset_index().set_index(['Geneid', 'Gene name', 'miRNA'])[[
-            'context++ score', 'gene_location', 'AGO2 HEAP peak', 
+            'context++ score', 'gene_location', 'AGO2 HEAP peak',
              'upregulated mutants', 'WT miRNA expression', 'WT mRNA expression', 'Interaction score'
         ]].to_excel(writer, sheet_name=f'Filtering {i+1}', startrow=1, index=True)
 
