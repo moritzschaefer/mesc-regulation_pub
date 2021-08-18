@@ -1,7 +1,7 @@
 import pandas as pd
 from moritzsphd.util.mirna.clustering import mirbase_clusters
 
-df = pd.read_excel(snakemake.input['interactions'], sheet_name='Filtering 4', skiprows=2, index_col=[0, 1, 2])
+df = pd.read_excel(snakemake.input['interactions'], sheet_name='Filtering 4', skiprows=1, index_col=[0, 1, 2])
 cluster_ko_des = pd.read_excel(snakemake.input['mir_cluster_des'], sheet_name='Main', skiprows=2, index_col=[0, 1], header=[0, 1]).xs('miR-290-295', axis=1, level=0).droplevel(level=1)
 
 clusters = mirbase_clusters()

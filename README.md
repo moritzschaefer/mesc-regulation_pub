@@ -4,20 +4,17 @@
 
 To facilitate running dedicated parts of the pipeline to generate specific plots, corresponding snakemake commands and script names are provided on a per-figure basis (including supplementary figures). All you need to run the pipeline is conda (4.9.1), snakemake (5.26.1) and my support library. Running the following commands should get you to a running environment:
 
-``` shell
-conda create -n mesc
-conda activate mesc
-conda install snakemake xlsxwriter openpyxl pyensembl
-pip install -e git+https://github.com/moritzschaefer/moritzsphd_pub.git#egg=moritzsphd
-```
+You can initialize the environment represented by the conda.yaml file.
 
-Alternatively, you can initialize the environment represented by the conda.yaml file.
+``` shell
+conda env create -f env/python.yaml --name mesc
+```
 
 Next, initialize pyensembl and clone the repository (if you haven't done so yet)
 ``` shell
 pyensembl install --release 98 --species mus_musculus
 cd ~/  # or wherever you want to store the source code 
-git clone https://github.com/moritzschaefer/mesc-regulation
+git clone https://github.com/moritzschaefer/mesc-regulation_pub
 cd mesc-regulation
 ```
 
@@ -31,7 +28,7 @@ Note that the generation of all output files might take a substantial amount of 
 Running the pipeline is as simple as the following (here for generating all plots from Figure 1)
 
 ``` shell
-snakemake --use-conda -j 4 figure1
+snakemake -j 4 figure1
 ```
 
 ## Additional information

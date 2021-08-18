@@ -22,6 +22,12 @@ dependencies:
   - swifter=1.0.7=py38h578d9bd_0
   - upsetplot=0.4.4=pyhd8ed1ab_0
   - tqdm=4.61.1=pyhd8ed1ab_0
+  - snakemake=6.4.1=hdfd78af_0
+  - snakemake-minimal=6.4.1=pyhdfd78af_0
+  - xlsxwriter=1.4.3=pyhd8ed1ab_0
+  - openpyxl=3.0.7=pyhd8ed1ab_0
+  - pyensembl==1.9.1
   - pip:
-    - "--editable=git+https://github.com/moritzschaefer/moritzsphd_pub.git#egg=moritzsphd"
     - pipelinehelper==0.7.8
+    - "--editable=git+https://github.com/moritzschaefer/moritzsphd_pub.git#egg=moritzsphd"
+
