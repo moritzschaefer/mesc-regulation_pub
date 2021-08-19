@@ -2,8 +2,33 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import seaborn as sns
-from moritzsphd.srna_seq_comparison.main import process_count_table
 from moritzsphd.util.mirna.clustering import cluster_to_name, mirbase_clusters
+
+
+def process_count_table(count_table, clusters, show_n=10):
+    '''
+    Args:
+        count_table: DataFrame with index name and one column count
+        clusters: mirna clusters with same naming scheme as df
+        show_n: Show the first n clusters
+    '''
+
+    count_table['cluster'] = ''
+    for i, cluster in enumerate(clusters):
+        cluster_name = cluster_to_name(cluster)
+        count_table.loc[count_table.index.isin(cluster), ('cluster', )] = \
+            cluster_name
+
+    grouped_counts = count_table.groupby('cluster').sum()
+    sorted_counts = grouped_counts.sort_values('count', ascending=False)
+
+    other_clusters = sorted_counts.iloc[show_n:, :].sum()
+    other_clusters.name = 'other'
+    sorted_counts.drop(sorted_counts.iloc[show_n:].index, inplace=True)
+    sorted_counts = sorted_counts.append(other_clusters)
+
+    return sorted_counts
+
 
 clusters = mirbase_clusters()
 
