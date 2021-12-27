@@ -27,12 +27,16 @@ rule cluster_target_cdf:
         data='output/cluster_kos/TableS6_miR-290-295KO_Quant-seq.xlsx',
         mirna_targets='output/mirnas/interaction_ranking_all.csv',
         up_genes='output/up_genes_all.txt',
-        ago2_heap='output/ago2_heap_mesc_mres.csv'
+        ago2_heap='output/ago2_heap_mesc_mres.csv',
+        unfiltered_interaction_data='output/mirnas/unfiltered_interaction_ranking_all.csv',
+        mrna_data='output/mrna_data_all.csv'
     output:
         plot='plot/cluster_kos/target_cdf_{cluster}.svg',
+        supp_plot='plot/cluster_kos/target_cdf_supp{cluster}.svg',
         up_percentage='output/cluster_percentage_{cluster}.txt'
     params:
         sample_colors=config['sample_colors'],
+        mirna_threshold=config['mirna_threshold'],
         plot_ts_predictions=True,
         plot_heap_predictions=True,
         plot_upregulation_predictions=True
