@@ -131,42 +131,6 @@ rule analyze_direct_mirna_targets:
     script: '../script/enrichment_analysis.py'
 
 
-rule cross_with_mirna_transfection_liu:
-    '''
-    Identify miRNAs targeting miRNA-dependent genes, filter the ones that are not mESC specific and cross them with mirna-MicroArray data.
-
-    4 of the mirnas (mmu-miR-200{a,b,c}-3p and mmu-miR-34a-5p), I have previously identified as mESC-specific, the others not.
-    2 of those are not expressed at all in our context: mmu-miR-133b-3p and mmu-miR-206-3p. The others all have an expression of at least 4 "CPM".
-
-    Liu data set overlap is very bad, presumably due to the lack of miRNA targeting conservation to human (from mouse)
-
-    '''
-    input:
-        liu_data=HTTP.remote('https://static-content.springer.com/esm/art%3A10.1186%2Fs13059-019-1629-z/MediaObjects/13059_2019_1629_MOESM2_ESM.xlsx', keep_local=True, static=True),
-        mirna_interactions='output/mirnas/interaction_ranking_protein_coding.csv'
-    output:
-        liu_targets='output/liu_targets.csv'
-    log: 'log/cross_with_mirna_transfection.log'
-    conda: '../env/python.yaml'
-    script: '../script/cross_with_mirna_transfection.py'
-
-
-rule cross_with_mirna_transfection_mir27a:
-    '''
-    https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE135308
-
-    TODO https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE125853 
-    '''
-    input:
-        tripathi_data=HTTP.remote('https://www.ncbi.nlm.nih.gov/geo/download/?acc=GSE135308&format=file&file=GSE135308_cpm_counts.csv.gz', keep_local=True, static=True),
-        mirna_interactions='output/mirnas/interaction_ranking_protein_coding.csv'
-    output:
-        targets='output/mir27a_targets.csv'
-
-    log: 'log/cross_with_mirna_transfection_mir27a.log'
-    conda: '../env/python.yaml'
-    script: '../script/cross_with_mirna_transfection_mir27a.py'
-
 rule ribo_seq_validation_supptable:
     input:
         ribo_seq='/mnt/cclab_nas/groupdata/Articles Raw data/2021/Schäfer et al. miRNA target prediction/copy_of_daniels/Tables/data_S4.xlsx',
