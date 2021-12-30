@@ -77,8 +77,10 @@ rule rank_direct_mirna_interactions:
     output:
         unfiltered='output/mirnas/unfiltered_interaction_ranking_{subset,(all|protein_coding)}.csv',
         filtered='output/mirnas/interaction_ranking_{subset}.csv',
+        low_filtered='output/mirnas/low_interaction_ranking_{subset}.csv',
         grouped='output/mirnas/interaction_ranking_grouped_{subset}.csv', # includes filtering
         up_genes='output/up_genes_{subset}.txt',
+        low_up_genes='output/low_up_genes_{subset}.txt',
         down_genes='output/down_genes_{subset}.txt'
     params:  # TODO this is not so cool...
         mutants=config['full_effect_mutants'],
