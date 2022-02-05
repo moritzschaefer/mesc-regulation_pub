@@ -19,3 +19,5 @@ flycheck*
 __pycache__/
 src/
 supp/
+
+*.tar.gz
