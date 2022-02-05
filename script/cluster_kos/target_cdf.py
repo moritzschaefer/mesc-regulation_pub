@@ -101,6 +101,7 @@ colors = snakemake.params['sample_colors'][mutant]
 unfiltered_interaction_df = pd.read_csv(snakemake.input['unfiltered_interaction_data']).query(f'`WT miRNA expression` > {snakemake.params.mirna_threshold}')
 # Use 'Interaction score' for ranking miRNA target genes with the simple formulae: max(interaction_scores) + (log10(n) + 1) * (sum(interactions_scores)/n)
 score_filtered = unfiltered_interaction_df.groupby('Geneid')['Interaction score'].agg(lambda group: group.max() + (np.log10(len(group)) + 1) * group.mean()).sort_values(ascending=False).iloc[:n_genes]
+score_filtered.index.to_series().to_csv(snakemake.output.score_filtered_targets)
 
 score_filtered_deg = diffexp_df.loc[score_filtered.index, "log2FoldChange"]
 sns.ecdfplot(score_filtered_deg, ax=ax2, label=f'Interaction score-based filter (n={len(score_filtered)})', color='#0000FF')
@@ -126,7 +127,7 @@ print(f'Kolmogorov-Smirnov test between DEGs of {len(score_filtered)} low-up-gen
 # sns.ecdfplot(non_target_deg, ax=ax, label=f'non-miR-290-295 predicted target, (n={len(non_target_deg)})', color='black')
 
 # just take the last one as control and format plot a little
-for axis in [ax, ax2, ax3]:
+for f, axis in zip([fig, fig2, fig3], [ax, ax2, ax3]):
     sns.ecdfplot(diffexp_df.loc[diffexp_df.baseMean > 100, 'log2FoldChange'].tolist(), ax=axis, label='expressed genes (control)', color='gray')
 
     axis.set_xlim([-0.5, 1.6])
@@ -135,8 +136,9 @@ for axis in [ax, ax2, ax3]:
     axis.axvline(0, color='gray')
     axis.grid(False)
     axis.set_xlabel('log2FoldChange in miR-290-295_KO vs WT')
-    axis.set_title('Differential expression of predicted miR-290-295 targets')
+    axis.set_title('Diff. expression of predicted miR-290-295 targets')
     sns.despine(ax=axis)
+    f.set_tight_layout(True)
 # plt.legend(loc='lower left', bbox_to_anchor=(0.1, 0.05))
 # plt.legend(loc='lower right')
 fig.savefig(snakemake.output['plot'])
