@@ -9,7 +9,7 @@ import seaborn as sns
 
 df = pd.read_csv(snakemake.input['mrna_data'], header=[0, 1], index_col=[0, 1])
 df = df[snakemake.params['mutants']]
-df = df.loc[(df.xs('tpm_expression', axis=1, level=1) > 1).any(axis=1)]  # filter lowly expression genes
+# df = df.loc[(df.xs('tpm_expression', axis=1, level=1) > 1).any(axis=1)]  # filter lowly expression genes
 padj = df.xs('padj', axis=1, level=1)
 log2fc = df.xs('log2FoldChange', axis=1, level=1)
 
@@ -20,9 +20,9 @@ min_ups = [2, 3, 4]
 plot_df = pd.DataFrame(index=max_padjs, columns=min_ups, dtype=int)
 for max_padj, min_up in itertools.product(max_padjs, min_ups):
     if direction == 'up':
-        count = (((padj < max_padj) & (log2fc > 0.5)).sum(axis=1) >= min_up).sum()
+        count = (((padj < max_padj) & (log2fc > 0.0)).sum(axis=1) >= min_up).sum()
     else:
-        count = (((padj < max_padj) & (log2fc < 0.5)).sum(axis=1) >= min_up).sum()
+        count = (((padj < max_padj) & (log2fc < 0.0)).sum(axis=1) >= min_up).sum()
     plot_df.loc[max_padj, min_up] = int(count)
 
 plot_df.columns = [str(v) for v in plot_df.columns]

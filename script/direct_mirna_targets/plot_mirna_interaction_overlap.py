@@ -18,10 +18,8 @@ padj.index = padj.index.droplevel(1)
 expr.index = expr.index.droplevel(1)
 expressed_genes = set(expr.index[(expr > 1).any(axis=1)])
 
-up_genes = mrna_data.index[(log2fc > snakemake.params['min_log2fc_lower']).all(axis=1) &
-                           (((log2fc > snakemake.params['min_log2fc_upper']) &
-                             (padj < snakemake.params['max_padj'])).sum(axis=1) >= snakemake.params['min_num_up_genes'])]
-
+with open(snakemake.input.up_genes, 'r') as f:
+    up_genes = f.read().strip('\n').split(',')
 
 ts_genes = set(ts_predictions['Geneid'].unique()) & expressed_genes
 ago2_genes = set(ago2_heap_data['gene_id'].unique()) & expressed_genes

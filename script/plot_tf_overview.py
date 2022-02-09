@@ -18,7 +18,6 @@ x = 'Number of targeting miR-290-295-miRNAs'
 y = 'Maximum interaction score'
 hue = 'score mean'
 metrics.rename(columns={'size': x, 'max': y, 'mean': hue}, inplace=True)
-metrics = metrics.drop(['Wiz'])
 fig, ax = plt.subplots(figsize=(6, 4))
 
 ax = sns.scatterplot(data=metrics, y=y, x=x, size=hue, hue=hue, ax=ax)

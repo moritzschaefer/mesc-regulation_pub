@@ -2,7 +2,7 @@ try:
     import gffutils
     import pandas as pd
     import pyBigWig
-    import swifter
+    # import swifter
     from tqdm import tqdm
     from tqdm.contrib.concurrent import process_map
     tqdm.pandas()
@@ -72,7 +72,7 @@ try:
     #                                      'is_3putr': 'max', 'isoform_expression': 'max'})
     # # for simplicity, we neglect the few cases with multiple binding sites of the same type in a 3p UTR
     # ts_predictions = ts_predictions.groupby(['Geneid', 'miRNA', 'mre_type', 'gene_location']) \
-    #                                .agg({'conserved': 'max', 'context++ score': lambda v: _sum_scores(v, True)})
+    #                                .agg({'conserved': 'max', 'weighted context++ score': lambda v: _sum_scores(v, True)})
 
     # df['is_3putr'] = (df['is_3putr'].astype(bool) | (df.index.get_level_values('gene_location') == '3putr')).astype(int)
     df['gene_location'] = df.progress_apply(lambda row: '3putr' if row.is_3putr else

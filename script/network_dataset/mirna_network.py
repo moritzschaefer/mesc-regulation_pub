@@ -12,7 +12,7 @@ interactions['ago2_heap_binding_scaled'] = MinMaxScaler().fit_transform(
 
 # TODO fillna(0) should be replaced with something binding-site dependent (e.g. better score for 8mers). Idea would be the CNN model from Bartel :cite:`briskin20_bioch_basis_cooper_action_micror`
 interactions['ts_score_scaled'] = MinMaxScaler().fit_transform(
-    -interactions['context++ score'].fillna(0).values.reshape(-1, 1))
+    -interactions['weighted context++ score'].fillna(0).values.reshape(-1, 1))
 
 # negative interaction (because miRNAs..)
 interactions['interaction_potential'] = (interactions['ago2_heap_binding_scaled'] + interactions['ts_score_scaled']) \

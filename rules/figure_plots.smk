@@ -187,7 +187,7 @@ rule plot_target_context_score:
         import seaborn as sns
 
         interaction_df = pd.read_csv(input['interaction_data'])
-        interactions = interaction_df.loc[interaction_df['Gene name'] == wildcards['gene'], 'context++ score']
+        interactions = interaction_df.loc[interaction_df['Gene name'] == wildcards['gene'], 'weighted context++ score']
         unfiltered_interaction_df = pd.read_csv(input['unfiltered_interaction_data']).query(f'`WT miRNA expression` > {params.mirna_threshold}')
         # ts_scores = pd.read_csv(input['targetscan_scores'])
 
@@ -195,22 +195,22 @@ rule plot_target_context_score:
 
 
         if params['plot_non_heaps']:
-            for val in unfiltered_interaction_df.loc[unfiltered_interaction_df['Gene name'] == wildcards['gene'], 'context++ score']:
+            for val in unfiltered_interaction_df.loc[unfiltered_interaction_df['Gene name'] == wildcards['gene'], 'weighted context++ score']:
                 ax.axvline(val, color='#D1e8ff')
 
         for interaction in interactions:
             ax.axvline(interaction, color='darkblue')
 
-        sns.kdeplot(interaction_df['context++ score'], ax=ax, color='gray')  # TODO maybe use ts_scores
+        sns.kdeplot(interaction_df['weighted context++ score'], ax=ax, color='gray')  # TODO maybe use ts_scores
 
         # ax.set_yscale('log')
         ax.set_xlim(ax.get_xlim()[::-1])
-        ax.set_xticks([0, interaction_df['context++ score'].min()]) # ts_scores.min()
+        ax.set_xticks([0, interaction_df['weighted context++ score'].min()]) # ts_scores.min()
         ax.set_yticklabels([])
         plt.grid(None)
         sns.despine()
         ax.set_ylabel('distribution')
-        ax.set_xlabel('context++ score')
+        ax.set_xlabel('weighted context++ score')
         # ax.set_title('TargetScan score')
         ax.grid(None)
         plt.tight_layout()
@@ -229,6 +229,7 @@ rule compute_feature_combination_count:
         interactions='output/TableS3_Integrative_analysis.xlsx'
     params:
         min_mirna_expression=config['mirna_threshold'],
+        padj_threshold=config['combined_padj_threshold'],
         # min_mrna_expression=config['mrna_threshold'],
         max_ts_score=config['ts_threshold'],
     conda: '../env/python.yaml'

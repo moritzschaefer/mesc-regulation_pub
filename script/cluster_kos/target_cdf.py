@@ -44,7 +44,6 @@ print(f'Mean target DEG: {target_deg.mean()}')
 # controls.extend(diffexp_df.loc[diffexp_df.baseMean > 100, 'log2FoldChange'].tolist())
 
 n_genes = len(target_deg)
-assert n_genes == 324, 'miR-290 targets should be 324'
 
 if snakemake.params['plot_ts_predictions']:
     ts_df = targetscan_summary()
@@ -57,7 +56,7 @@ if snakemake.params['plot_ts_predictions']:
             return gn2id(row['Gene Symbol'])
     ts_df['gene_id'] = ts_df.apply(_get_gene_id, axis=1)
 
-    # filter the 324 genes with lowest targetscan scores (lower is "better")
+    # filter the <n_genes> genes with lowest targetscan scores (lower is "better")
     ts_target_genes = ts_df.groupby('gene_id')['Cumulative weighted context++ score'] \
                            .min().sort_values().iloc[:n_genes].index
     ts_target_genes_deg = diffexp_df.loc[ts_target_genes, 'log2FoldChange']
@@ -127,7 +126,7 @@ print(f'Kolmogorov-Smirnov test between DEGs of {len(score_filtered)} low-up-gen
 # sns.ecdfplot(non_target_deg, ax=ax, label=f'non-miR-290-295 predicted target, (n={len(non_target_deg)})', color='black')
 
 # just take the last one as control and format plot a little
-for f, axis in zip([fig, fig2, fig3], [ax, ax2, ax3]):
+for f, axis, output_label in zip([fig, fig2, fig3], [ax, ax2, ax3], ['plot', 'supp_plot', 'low_up_supp_plot']):
     sns.ecdfplot(diffexp_df.loc[diffexp_df.baseMean > 100, 'log2FoldChange'].tolist(), ax=axis, label='expressed genes (control)', color='gray')
 
     axis.set_xlim([-0.5, 1.6])
@@ -139,8 +138,7 @@ for f, axis in zip([fig, fig2, fig3], [ax, ax2, ax3]):
     axis.set_title('Diff. expression of predicted miR-290-295 targets')
     sns.despine(ax=axis)
     f.set_tight_layout(True)
+
+    f.savefig(snakemake.output[output_label])
 # plt.legend(loc='lower left', bbox_to_anchor=(0.1, 0.05))
 # plt.legend(loc='lower right')
-fig.savefig(snakemake.output['plot'])
-fig2.savefig(snakemake.output['supp_plot'])
-fig3.savefig(snakemake.output['low_up_supp_plot'])

@@ -19,7 +19,8 @@ acceptance_factor = snakemake.params['acceptance_factor']
 fig, axes = plt.subplots(1, len(genes), figsize=(4 * len(genes), 4), sharey=True, squeeze=False)
 
 mir290de_genes.rename(columns={'log2FoldChange': 'miR290KO log2FC'}, inplace=True)
-si_des = pd.read_excel(snakemake.input['sipool_des'], sheet_name='Main', skiprows=2,
+#skiprows=2 is relevant if the xlsx got beautified (for publication)
+si_des = pd.read_excel(snakemake.input['sipool_des'], sheet_name='Main', skiprows=1,
                        index_col=[0, 1], header=[0, 1]).droplevel(level=1, axis=0)
 
 for gene, ax in zip(genes, axes[0, :]):

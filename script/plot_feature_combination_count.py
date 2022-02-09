@@ -7,11 +7,11 @@ TargetScan designed its context++ score only for 3' UTRs of mRNAs. To prevent th
 '''
 
 import itertools
+import pdb
 # already filterted for minimum of 1 TPM in any mutant
 from collections import defaultdict
 from multiprocessing import Pool, cpu_count
 
-import ipdb
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -36,5 +36,5 @@ try:
 
     plt.savefig(snakemake.output[0])
 except:
-    ipdb.post_mortem()
+    pdb.post_mortem()
     raise

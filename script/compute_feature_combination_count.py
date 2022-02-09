@@ -7,11 +7,11 @@ TargetScan designed its context++ score only for 3' UTRs of mRNAs. To prevent th
 '''
 
 import itertools
+import pdb
 # already filterted for minimum of 1 TPM in any mutant
 from collections import defaultdict
 from multiprocessing import Pool, cpu_count
 
-import ipdb
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -33,7 +33,8 @@ try:
         'AGO2 binding': lambda row: row['AGO2 HEAP peak'] > 0,
         'WT miRNA expression': lambda row: row['WT miRNA expression'] > snakemake.params['min_mirna_expression'],
         'Mutant upregulation': lambda row: up_genes.get(row.name[0], False),
-        'TargetScan score': lambda row: row['context++ score'] < snakemake.params['max_ts_score']
+        'TargetScan score': lambda row: (row['weighted context++ score'] < snakemake.params['max_ts_score']) or
+                              ((not row['is_3putr']) and (row['MRE type'] in ['7merm8', '8mer']))
     }
     selectors = {f: df.apply(filters[f], axis=1) for f in filters}
 
@@ -50,7 +51,7 @@ try:
         subdf = df.loc[combined_selector].copy()
         if sum(binary) >= 3:
             # Scorify (0.0-1.0) our features
-            score_df, _ = score(subdf, padj, log2fc)
+            score_df, _ = score(subdf, padj, log2fc, snakemake.params['padj_threshold'])
             subdf = subdf.loc[score_df.index]
             subdf['Interaction score'] = score_df['interaction_score']
 
@@ -68,7 +69,7 @@ try:
     writer = pd.ExcelWriter(snakemake.output['interactions'], engine='xlsxwriter')
     for i, (filter_name, filtered_df) in enumerate(filtered_dfs.items()):
         filtered_df.reset_index().set_index(['Geneid', 'Gene name', 'miRNA'])[[
-            'context++ score', 'gene_location', 'AGO2 HEAP peak',
+            'weighted context++ score', 'gene_location', 'AGO2 HEAP peak',
              'upregulated mutants', 'WT miRNA expression', 'WT mRNA expression', 'Interaction score'
         ]].to_excel(writer, sheet_name=f'Filtering {i+1}', startrow=1, index=True)
 
@@ -77,5 +78,5 @@ try:
     writer.save()
 
 except:
-    ipdb.post_mortem()
+    pdb.post_mortem()
     raise

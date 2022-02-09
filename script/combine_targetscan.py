@@ -22,7 +22,7 @@ conserved_df = pd.read_csv(snakemake.input['conserved'][0], sep='\t')
 nonconserved_df = pd.read_csv(snakemake.input['nonconserved'][0], sep='\t')
 
 # output_columns = [
-#         'Gene Symbol', 'miRNA', 'context++ score',
+#         'Gene Symbol', 'miRNA', 'weighted context++ score',
 #         'context++ score percentile', 'context++ score',
 #         'context++ score percentile', 'geneId'
 #     ]
@@ -35,8 +35,8 @@ df['mre_type'] = df['Site Type'].apply({1: '7merA1', 2: '7merm8', 3: '8mer'}.get
 df['Geneid'] = cut_version(df['Gene ID'])
 df.drop(df.index[df['Geneid'].isna()], inplace=True)
 df.drop(df.index[df['Gene Tax ID'] != 10090], inplace=True)
-# approximately 10% of nonconserved don't have a context++ score. delete them
-df.drop(df.index[df['context++ score'].isna()], inplace=True)
+# approximately 10% of nonconserved don't have a weighted context++ score. delete them
+df.drop(df.index[df['weighted context++ score'].isna()], inplace=True)
 df.drop(columns=['Gene Tax ID', 'Gene ID', 'Site Type'], inplace=True)
 
 # find genome-position of MRE

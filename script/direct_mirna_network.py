@@ -61,7 +61,7 @@ df = df.groupby(['Geneid', 'Gene name', 'seed', 'miRNA family']).agg({
     '#(upregulated mutants)': 'max',
     'Interaction score': 'max',
     'mESC specific miRNA': lambda group: 'yes' if np.mean(group) >= 0.5 else 'no',
-    'context++ score': 'min',
+    'weighted context++ score': 'min',
     'WT miRNA expression': 'sum'
 })
 
@@ -89,7 +89,7 @@ df['#(upregulated mutants)'] = df['#(upregulated mutants)'].astype(float)
 # delete some low-quality connections
 df = df[df['Interaction score'] > 1.2]
 
-graph = nx.convert_matrix.from_pandas_edgelist(df.reset_index(), 'miRNA family', 'Gene name', ['Interaction score', 'AGO2 HEAP peak', 'MRE type'])  # 'MRE conserved', 'context++ score',  <- has NaNs
+graph = nx.convert_matrix.from_pandas_edgelist(df.reset_index(), 'miRNA family', 'Gene name', ['Interaction score', 'AGO2 HEAP peak', 'MRE type'])  # 'MRE conserved', 'weighted context++ score',  <- has NaNs
 for key in graph.nodes:
     try:
         values = df[df['Gene name'] == key].iloc[0][[

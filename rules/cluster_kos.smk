@@ -33,7 +33,7 @@ rule cluster_target_cdf:
         unfiltered_interaction_data='output/mirnas/unfiltered_interaction_ranking_all.csv',
         mrna_data='output/mrna_data_all.csv'
     output:
-        plot='plot/cluster_kos/target_cdf_{cluster}.png',
+        plot='plot/cluster_kos/target_cdf_{cluster}.svg',
         supp_plot='plot/cluster_kos/target_cdf_supp_{cluster}.svg',
         low_up_supp_plot='plot/cluster_kos/low_up_cdf_supp_{cluster}.svg',
         up_percentage='output/cluster_percentage_{cluster}.txt',

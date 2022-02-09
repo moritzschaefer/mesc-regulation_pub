@@ -7,7 +7,7 @@ from scipy.stats.mstats import gmean
 from sklearn.preprocessing import MinMaxScaler
 
 
-def score(df, padj, log2fc, padj_threshold=0.1):
+def score(df, padj, log2fc, padj_threshold):
     score_df = pd.DataFrame(index=df.index)
     # TODO maybe take score from  script/mir290_ml/dataset.py
     score_df['mutant_up_score'] = (
@@ -18,7 +18,7 @@ def score(df, padj, log2fc, padj_threshold=0.1):
 
     score_df['wt_mirna_expression'] = MinMaxScaler().fit_transform(X=np.log2(df['WT miRNA expression'] + 1).values.reshape(-1, 1))
     # MRE score is a bit more complicated because of the noncoding genes (they dont have a context++-score)
-    cs = df['context++ score']
+    cs = df['weighted context++ score']
     score_df['mre_score'] = MinMaxScaler().fit_transform(-cs.values.reshape(-1, 1))
     score_df['heap_ago2'] = MinMaxScaler().fit_transform(np.log2(df['AGO2 HEAP peak'] + 1).values.reshape(-1, 1))
 

@@ -14,15 +14,13 @@ try:
     tpm = mrna_data.xs('tpm_expression', axis=1, level=1)
 
     # TODO maybe I should use something simpler..
-    up_genes = mrna_data.index[(log2fc > snakemake.params['min_log2fc_lower']).all(axis=1) &
-                            (((log2fc > snakemake.params['min_log2fc_upper']) &
-                                (padj < snakemake.params['padj_threshold'])).sum(axis=1) >= snakemake.params['min_num_up_genes'])]
+    up_genes = mrna_data.index[((log2fc > 0) &
+                                (padj < snakemake.params['padj_threshold'])).sum(axis=1) >= snakemake.params['min_num_up_genes']]
     low_up_genes = mrna_data.index[(tpm > 1).any(axis=1) & (((log2fc > 0.1) & (log2fc < 0.5)).sum(axis=1) >= 4)]
     # low_up_genes = mrna_data.index[((log2fc > 0.1) & (log2fc < 0.5)).sum(axis=1) >= snakemake.params['min_num_up_genes']]
 
-    down_genes = mrna_data.index[(log2fc < -snakemake.params['min_log2fc_lower']).all(axis=1) &
-                            (((log2fc < -snakemake.params['min_log2fc_upper']) &
-                                (padj < snakemake.params['padj_threshold'])).sum(axis=1) >= snakemake.params['min_num_up_genes'])]
+    down_genes = mrna_data.index[((log2fc < 0) &
+                                  (padj < snakemake.params['padj_threshold'])).sum(axis=1) >= snakemake.params['min_num_up_genes']]
 
     with open(snakemake.output.up_genes, 'w') as f:
         f.write(','.join(up_genes.get_level_values(0)))
@@ -46,6 +44,11 @@ try:
 
             # filter for miRNA expression
             subdf = subdf.loc[subdf['WT miRNA expression'] > snakemake.params['min_mirna_expression']]
+            # filter for context++ score
+
+            # this might not be ideal. Maybe there are collaborative interactions with individually low context++ scores
+            subdf = subdf.loc[(subdf['weighted context++ score'] < snakemake.params['max_ts_score']) |
+                              ((~subdf['is_3putr'].astype(bool)) & (subdf['MRE type'].isin(['7merm8', '8mer'])))]
 
         # Scorify (0.0-1.0) our features
         score_df, gene_order = score(subdf, padj, log2fc, snakemake.params['padj_threshold'])

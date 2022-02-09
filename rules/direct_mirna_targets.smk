@@ -84,25 +84,19 @@ rule rank_direct_mirna_interactions:
         down_genes='output/down_genes_{subset}.txt'
     params:  # TODO this is not so cool...
         mutants=config['full_effect_mutants'],
-        # max_ts_score=config['ts_threshold'],
+        max_ts_score=config['ts_threshold'],
         min_mirna_expression=config['mirna_threshold'],
         min_num_up_genes=2,
-        min_log2fc_lower=-0.4,
-        min_log2fc_upper=0.5,
-        padj_threshold=config['padj_threshold'],
+        padj_threshold=config['combined_padj_threshold']
     conda: '../env/python.yaml'
     script: '../script/direct_mirna_targets/rank_direct_mirna_interactions.py'
 
 rule plot_mirna_interaction_overlap:
     input:
         raw_interactions='output/mirnas/raw_mirna_interactions_{subset}.csv',
+        up_genes="output/up_genes_{subset}.txt"
     output:
         overlap_plot='plot/mirna_interaction_overlap_{subset}.svg'
-    params:
-        min_num_up_genes=2,
-        min_log2fc_lower=-0.4,
-        min_log2fc_upper=0.5,
-        max_padj=0.1,
     conda: '../env/python.yaml'
     script: '../script/direct_mirna_targets/plot_mirna_interaction_overlap.py'
 
