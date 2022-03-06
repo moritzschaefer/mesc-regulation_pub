@@ -2,7 +2,6 @@ library(eulerr)
 
 # hacky
 df.col.readnames <- c("Geneid", "Genename",
-                      "Dgcr8_tpm", "Dgcr8_log2FoldChange", "Dgcr8_padj",
                       "Drosha_tpm", "Drosha_log2FoldChange", "Drosha_padj",
                       "Dicer_tpm", "Dicer_log2FoldChange", "Dicer_padj",
                       "Ago12_tpm", "Ago12_log2FoldChange", "Ago12_padj",
@@ -12,7 +11,6 @@ df.col.readnames <- c("Geneid", "Genename",
                       "WT_tpm", "WT_log2FoldChange", "WT_padj")
 
 df.col.usenames <- c("Geneid", "Genename",
-                      "Dgcr8_tpm", "Dgcr8_log2FoldChange", "Dgcr8_padj",
                       "Drosha_tpm", "Drosha_log2FoldChange", "Drosha_padj",
                       "Dicer_tpm", "Dicer_log2FoldChange", "Dicer_padj",
                       "Ago12_tpm", "Ago12_log2FoldChange", "Ago12_padj",
@@ -21,7 +19,7 @@ df.col.usenames <- c("Geneid", "Genename",
 df <- read.table(snakemake@input[[1]], sep=",", skip=2, col.names=df.col.readnames)
 df <- df[df.col.usenames]  # ignore ago single mutants
 
-mutants <- c("Dgcr8", "Drosha", "Dicer", "Ago12")
+mutants <- snakemake@params[["mutants"]]
 
 # only select genes with minimal expression (say 0.5 tpm)
 mcols <- sapply(mutants, function(m) paste(m, "tpm", sep="_"))

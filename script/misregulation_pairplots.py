@@ -9,7 +9,7 @@ try:
     mrna_file = snakemake.input[0]
     outfile = snakemake.output[0]
 except NameError:
-    mutants = ['Dgcr8', 'Drosha', 'Dicer', 'Ago12']
+    mutants = ['Drosha', 'Dicer', 'Ago12']
     mrna_file = './output/mrna_data_protein_coding.csv'
     outfile = '/tmp/outfile.png'
 

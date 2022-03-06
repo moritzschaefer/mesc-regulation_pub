@@ -5,7 +5,6 @@ from scipy.stats import ttest_ind
 
 log = open(snakemake.log[0], 'w')
 
-
 df = pd.read_excel(snakemake.input['ribo_seq'], index_col=[0, 1])
 mutants = snakemake.params['mutants']
 ribo_log2fc = df[[m.upper() + '_log2FC' for m in mutants]]

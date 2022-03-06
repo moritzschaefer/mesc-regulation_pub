@@ -141,7 +141,8 @@ rule plot_target_log2fc:
         mrna_data='output/mrna_data_all.csv'
     params:
         vmin=-1.5,
-        vmax=1.5
+        vmax=1.5,
+        full_effect_mutants=config['full_effect_mutants']
     output:
         'plot/target_data/target_log2fc_{gene}.pdf',
     run:
@@ -153,11 +154,11 @@ rule plot_target_log2fc:
 
 
         cmap = sns.color_palette("coolwarm", as_cmap=True)
-        norm = mpl.colors.Normalize(**params)
+        norm = mpl.colors.Normalize(vmin=params['vmin'], vmax=params['vmax'])
 
         mrna_df = pd.read_csv(input['mrna_data'], header=[0, 1], index_col=[0, 1])
-        log2fc = mrna_df.xs('log2FoldChange', axis=1, level=1).droplevel(level=0)[['Dgcr8', 'Drosha', 'Dicer', 'Ago12']]
-        log2fc.columns = ['Dgcr8_KO', 'Drosha_KO', 'Dicer_KO', 'Ago2&1_KO']
+        log2fc = mrna_df.xs('log2FoldChange', axis=1, level=1).droplevel(level=0)[params['full_effect_mutants']]
+        log2fc.columns = ['Drosha_KO', 'Dicer_KO', 'Ago2&1_KO']
 
         gene_data = log2fc.loc[wildcards['gene']]
         color_list = cmap(norm(gene_data))

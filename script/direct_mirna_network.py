@@ -3,9 +3,8 @@ import json
 import networkx as nx
 import numpy as np
 import pandas as pd
-from scipy.stats.mstats import gmean
-
 from moritzsphd.data import mirbase_seqs
+from scipy.stats.mstats import gmean
 
 # TODO add information about PRC2, SwiSNF, ..., and other complexes
 # TODO legend!
@@ -17,7 +16,7 @@ try:
     mesc_mirna_fn = snakemake.input['mesc_mirna_fn']
     mrna_data_fn = snakemake.input['mrna_data_fn']
 except NameError:
-    mutants = ['Dgcr8', 'Drosha', 'Dicer', 'Ago12']
+    mutants = ['Drosha', 'Dicer', 'Ago12']
     interaction_fn = '../output/mirnas/interaction_ranking_protein_coding.csv'
     tf_fn = '../output/tf_annotation.csv'
     mesc_mirna_fn = '../output/mesc_mirnas.csv'
