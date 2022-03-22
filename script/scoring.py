@@ -9,7 +9,7 @@ from sklearn.preprocessing import MinMaxScaler
 
 def score(df, padj, log2fc, padj_threshold):
     score_df = pd.DataFrame(index=df.index)
-    # TODO maybe take score from  script/mir290_ml/dataset.py
+    # TODO maybe take score from script/mir290_ml/dataset.py
     score_df['mutant_up_score'] = (
         (
             (padj.loc[df.index.droplevel([2, 3, 4])] < padj_threshold) &

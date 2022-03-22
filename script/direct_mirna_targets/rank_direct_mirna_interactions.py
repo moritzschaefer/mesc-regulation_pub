@@ -13,13 +13,12 @@ try:
     padj = mrna_data.xs('padj', axis=1, level=1)
     tpm = mrna_data.xs('tpm_expression', axis=1, level=1)
 
-    # TODO maybe I should use something simpler..
-    up_genes = mrna_data.index[((log2fc > 0) &
+    up_genes = mrna_data.index[((log2fc > snakemake.params['log2fc_threshold']) &
                                 (padj < snakemake.params['padj_threshold'])).sum(axis=1) >= snakemake.params['min_num_up_genes']]
-    low_up_genes = mrna_data.index[(tpm > 1).any(axis=1) & (((log2fc > 0.1) & (log2fc < 0.5)).sum(axis=1) >= 4)]
+    low_up_genes = mrna_data.index[(tpm > 1).any(axis=1) & (((log2fc > 0.1) & (log2fc < 0.5)).sum(axis=1) == len(snakemake.params['mutants']))]
     # low_up_genes = mrna_data.index[((log2fc > 0.1) & (log2fc < 0.5)).sum(axis=1) >= snakemake.params['min_num_up_genes']]
 
-    down_genes = mrna_data.index[((log2fc < 0) &
+    down_genes = mrna_data.index[((log2fc < snakemake.params['log2fc_threshold']) &
                                   (padj < snakemake.params['padj_threshold'])).sum(axis=1) >= snakemake.params['min_num_up_genes']]
 
     with open(snakemake.output.up_genes, 'w') as f:
@@ -46,6 +45,7 @@ try:
             subdf = subdf.loc[subdf['WT miRNA expression'] > snakemake.params['min_mirna_expression']]
             # filter for context++ score
 
+            # TargetScan filtering
             # this might not be ideal. Maybe there are collaborative interactions with individually low context++ scores
             subdf = subdf.loc[(subdf['weighted context++ score'] < snakemake.params['max_ts_score']) |
                               ((~subdf['is_3putr'].astype(bool)) & (subdf['MRE type'].isin(['7merm8', '8mer'])))]

@@ -21,8 +21,8 @@ mir290_targets.loc[mir290_targets.index.intersection(tf_df.index), 'is TF'] = 'y
 mir290_targets['Status'] = 'Unconfirmed'
 mir290_targets.loc[(mir290_targets['miR-290-295_KO log2FC'] > 0.0),
                    'Status'] = 'Positive log2FC'
-mir290_targets.loc[(mir290_targets['miR-290-295_KO log2FC'] > 0.5) &
-                   (mir290_targets['miR-290-295_KO padj'] < 0.1),
+mir290_targets.loc[(mir290_targets['miR-290-295_KO log2FC'] > snakemake.params['log2fc_threshold']) &
+                   (mir290_targets['miR-290-295_KO padj'] < snakemake.params['padj_threshold']),
                    'Status'] = 'Significantly Upregulated/Confirmed'
 
 mir290_targets.to_excel(snakemake.output['supp_table'])

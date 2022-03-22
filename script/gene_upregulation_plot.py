@@ -9,7 +9,8 @@ import seaborn as sns
 
 df = pd.read_csv(snakemake.input['mrna_data'], header=[0, 1], index_col=[0, 1])
 df = df[snakemake.params['mutants']]
-# df = df.loc[(df.xs('tpm_expression', axis=1, level=1) > 1).any(axis=1)]  # filter lowly expression genes
+
+# df = df.loc[(df.xs('tpm_expression', axis=1, level=1) > 1).any(axis=1)]  # No filter for lowly expression genes, as this is already taken into account by DEG analysis and reflected in the p-value
 padj = df.xs('padj', axis=1, level=1)
 log2fc = df.xs('log2FoldChange', axis=1, level=1)
 

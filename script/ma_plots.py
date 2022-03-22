@@ -32,7 +32,7 @@ for i, mutant in enumerate(mutants):
 
     #volcanoplot(data=df[df.baseMean > 20], ax=ax, alpha=0.3, show_n=True)
 
-    maplot(data=mutant_df[mutant_df['mean TPM'] > 0.1], ax=ax, mean='mean TPM', p_threshold=0.1, palette=palette)
+    maplot(data=mutant_df[mutant_df['mean TPM'] > 0.1], ax=ax, mean='mean TPM', p_threshold=snakemake.params['padj_threshold'], palette=palette)
     ax.set_title(f'{mutant}vsWT')
     if i == 0:
         red_patch = mpatches.Patch(color=palette['up'], label='Significanly up-regulated genes')

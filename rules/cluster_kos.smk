@@ -69,5 +69,8 @@ rule cluster_mir290_targets_supp_table:
         tf_annotation='output/tf_annotation.csv',
     output:
         supp_table='output/cluster_kos/SuppTable_mir290_targets.xlsx',
+    params:
+        log2fc_threshold=config['log2fc_threshold'],
+        padj_threshold=config['padj_threshold'],
     conda: '../env/python.yaml'
     script: '../script/cluster_kos/mir290_targets_supp_table.py'

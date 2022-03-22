@@ -82,12 +82,13 @@ rule rank_direct_mirna_interactions:
         up_genes='output/up_genes_{subset}.txt',
         low_up_genes='output/low_up_genes_{subset}.txt',
         down_genes='output/down_genes_{subset}.txt'
-    params:  # TODO this is not so cool...
+    params:
         mutants=config['full_effect_mutants'],
         max_ts_score=config['ts_threshold'],
         min_mirna_expression=config['mirna_threshold'],
-        min_num_up_genes=2,
-        padj_threshold=config['combined_padj_threshold']
+        min_num_up_genes=config['min_num_up_genes'],
+        padj_threshold=config['combined_padj_threshold'],
+        log2fc_threshold=config['log2fc_threshold']
     conda: '../env/python.yaml'
     script: '../script/direct_mirna_targets/rank_direct_mirna_interactions.py'
 

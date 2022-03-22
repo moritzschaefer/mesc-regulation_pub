@@ -80,7 +80,7 @@ try:
     df.set_index('gene_location', append=True, inplace=True)
 
     # mutant_abbrv = {'Dicer': 'Di', 'Drosha': 'Dr', 'Dgcr8': 'Dg', 'Ago12': 'Ag'}
-    df['upregulated mutants'] = ((padj.loc[df.index.get_level_values(0)] < snakemake.params['padj_threshold']) &
+    df['upregulated mutants'] = ((padj.loc[df.index.get_level_values(0)] < snakemake.params['combined_padj_threshold']) &
                                 (log2fc.loc[df.index.get_level_values(0)] > snakemake.params['log2fc_threshold'])).reset_index(drop=True).apply(  # convert to short-names
         lambda row: ','.join(row.index[row].map(lambda i: i[:2])),
         axis=1).values

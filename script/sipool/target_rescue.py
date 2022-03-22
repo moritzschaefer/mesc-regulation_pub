@@ -10,7 +10,7 @@ mir295mirnas = [c for c in clusters if 'mmu-miR-295-5p' in c][0]
 
 interactions = pd.read_csv(snakemake.input['interactions'])
 mir290_targets = interactions.loc[interactions.miRNA.isin(mir295mirnas), 'Geneid'].drop_duplicates()
-mir290de_genes = mir290de.loc[(mir290de.log2FoldChange.abs() > 0.5) & (mir290de.padj < 0.1)]
+mir290de_genes = mir290de.loc[(mir290de.log2FoldChange.abs() > snakemake.params['log2fc_threshold']) & (mir290de.padj < snakemake.params['padj_threshold'])]
 mir290de_genes['role'] = pd.Categorical(['unexplained'] * len(mir290de_genes), categories=['unexplained', 'miR290 target', 'potential TF target'], ordered=True)
 mir290de_genes.loc[mir290de_genes.index.isin(mir290_targets) & (mir290de_genes.log2FoldChange > 0), 'role'] = 'miR290 target'
 genes = snakemake.params['genes']

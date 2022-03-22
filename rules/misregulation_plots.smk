@@ -5,7 +5,8 @@ rule ma_plots:
     input: 'output/mrna_data_{subset}.csv'
     output: 'plot/ma_{subset}.{ext}'
     params:
-        mutants=config['full_effect_mutants']
+        mutants=config['full_effect_mutants'],
+        padj_threshold=config['padj_threshold'],
     conda: '../env/python.yaml'
     script: '../script/ma_plots.py'
 
@@ -13,15 +14,18 @@ rule misregulation_overlap_plots:
     input: 'output/mrna_data_{subset}.csv'
     output: 'plot/overlaps_{subset}_{direction}.svg',
     params:
+        log2fc_threshold=config['log2fc_threshold'],
+        padj_threshold=config['padj_threshold'],
         mutants=config['full_effect_mutants']
-    conda: '../env/eulerr.yaml'  # doesn't work in nixos+conda
-    script: '../script/misregulation_overlap_plots.R'
+    conda: '../env/python.yaml'
+    script: '../script/misregulation_overlap_plots.py'
 
 rule misregulation_pairplots:
     input: 'output/mrna_data_{subset}.csv'
     output: 'plot/misregulation_pairplot{filtered,(_filtered)?}_{subset}.svg'
     params:
-        mutants=config['full_effect_mutants']
+        mutants=config['full_effect_mutants'],
+        padj_threshold=config['padj_threshold'],
     conda: '../env/python.yaml'
     script: '../script/misregulation_pairplots.py'
 

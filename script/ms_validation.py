@@ -45,7 +45,7 @@ ax.set_xlabel('log2FC')
 fig.savefig(snakemake.output['plot'])
 
 ms_dropped = ms_selection.dropna()
-for i in range(1, 5):
+for i in range(1, (len(mutants) + 1)):
     stat = ((ms_dropped > 0).sum(axis=1) >= i).value_counts()
     log.write(
         f'For {stat[True]} of {len(ms_dropped)} genes ({round(100.0 * stat[True]/len(ms_dropped))}%) we see a positive log2FC in at least {i} mutants.\n')

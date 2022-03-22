@@ -47,9 +47,10 @@ mrna_diffexp_path: cclab:/home/schamori/snakepipelines/rna-seq/DESeq2_{sample}/D
 expression_path: cclab:/home/schamori/snakepipelines/rna-seq/featureCounts/counts.tsv
 quant_seq_expression_path: cclab:/home/schamori/snakepipelines/quant-seq/featureCounts/counts.tsv
 
-combined_padj_threshold: 0.1
+min_num_up_genes: 2
+combined_padj_threshold: 0.2
 padj_threshold: 0.1
-log2fc_threshold: 0.5
+log2fc_threshold: 0.0
 # minimal expression
 basemean_threshold: 10
 mirna_threshold: 10

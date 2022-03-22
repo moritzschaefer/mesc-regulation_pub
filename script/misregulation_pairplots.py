@@ -22,7 +22,7 @@ log2fc = df.xs('log2FoldChange', axis=1, level=1)
 padj = df.xs('padj', axis=1, level=1)
 
 if filtered:
-    plotdf = log2fc.loc[(padj < 0.1).any(axis=1)][mutants].dropna()
+    plotdf = log2fc.loc[(padj < snakemake.params['padj_threshold']).any(axis=1)][mutants].dropna()
 else:
     plotdf = log2fc[mutants].dropna()
 

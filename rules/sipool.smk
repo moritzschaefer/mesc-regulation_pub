@@ -44,7 +44,9 @@ rule sipool_target_rescue:
         rescue_df='output/sipool/rescues.csv'
     params:
         genes=list(config['siPOOL_targets'].keys()),
-        acceptance_factor=2
+        acceptance_factor=2,
+        log2fc_threshold=config['log2fc_threshold'],
+        padj_threshold=config['padj_threshold'],
     conda:
         '../env/python.yaml'
     script:
