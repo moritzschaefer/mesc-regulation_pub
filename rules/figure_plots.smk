@@ -230,7 +230,7 @@ rule compute_feature_combination_count:
         interactions='output/TableS3_Integrative_analysis.xlsx'
     params:
         min_mirna_expression=config['mirna_threshold'],
-        padj_threshold=config['combined_padj_threshold'],
+        combined_padj_threshold=config['combined_padj_threshold'],
         # min_mrna_expression=config['mrna_threshold'],
         max_ts_score=config['ts_threshold'],
     conda: '../env/python.yaml'
@@ -255,6 +255,9 @@ rule plot_tf_overview:
         interaction_ranking='output/mirnas/interaction_ranking_all_istf.csv'
     output:
         'plot/mir_290_regulated_tfs.svg'
+    params:
+        padj_threshold=config['padj_threshold'],
+        log2fc_threshold=config['log2fc_threshold'],
     conda: '../env/python.yaml'
     script: '../script/plot_tf_overview.py'
 

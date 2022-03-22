@@ -51,7 +51,7 @@ try:
         subdf = df.loc[combined_selector].copy()
         if sum(binary) >= 3:
             # Scorify (0.0-1.0) our features
-            score_df, _ = score(subdf, padj, log2fc, snakemake.params['padj_threshold'])
+            score_df, _ = score(subdf, padj, log2fc, snakemake.params['combined_padj_threshold'])
             subdf = subdf.loc[score_df.index]
             subdf['Interaction score'] = score_df['interaction_score']
 

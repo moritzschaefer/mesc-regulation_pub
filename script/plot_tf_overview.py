@@ -8,7 +8,7 @@ mir295mirnas = [c for c in clusters if 'mmu-miR-295-5p' in c][0]
 mir290de = pd.read_excel(snakemake.input['supp_table'])
 df = pd.read_csv(snakemake.input['interaction_ranking'])
 df = df[df['miRNA'].isin(mir295mirnas) & df['is_tf']]
-positives = mir290de.loc[(mir290de['miR-290-295_KO log2FC'] > snakemake.params['log2fc_threshold']) & (mir290de['miR-290-295_KO padj'] < snakemake.params['padj_threshold')]
+positives = mir290de.loc[(mir290de['miR-290-295_KO log2FC'] > snakemake.params['log2fc_threshold']) & (mir290de['miR-290-295_KO padj'] < snakemake.params['padj_threshold'])]
 
 df = df[df.Geneid.isin(positives['Geneid'])]
 
