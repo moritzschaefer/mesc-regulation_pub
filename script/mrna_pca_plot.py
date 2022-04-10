@@ -14,7 +14,7 @@ sorted_colors = [snakemake.params['sample_colors'][m[:m.find('_')]]
 cmap = matplotlib.colors.LinearSegmentedColormap.from_list(
     'Sample colors', sorted_colors,
     len(snakemake.params['sample_colors']))
-ax, explained_variances = pcaplot(counts, scaling='standard', ax=ax, cmap=cmap)
+ax, explained_variances = pcaplot(counts, scaling='log2', ax=ax, cmap=cmap)
 
 ax.set_xlabel(f'Principal Component 1 ({int(explained_variances[0] * 100)}%)')
 ax.set_ylabel(f'Principal Component 2 ({int(explained_variances[1] * 100)}%)')

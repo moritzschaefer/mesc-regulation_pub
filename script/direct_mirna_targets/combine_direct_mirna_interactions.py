@@ -10,8 +10,11 @@ try:
     # load data
     mrna_data = pd.read_csv(snakemake.input['mrna_data'], index_col=[0, 1], header=[0, 1])
     mrna_data = mrna_data[snakemake.params['mutants'] + ['WT']]
-    mirna_expression = pd.read_csv(snakemake.input['mirna_expression'], index_col=0, header=[0, 1]) \
-        .xs('Expression', axis=1, level=1)
+    # mirna_expression = pd.read_csv(snakemake.input['mirna_expression'], index_col=0, header=[0, 1]) \
+    #     .xs('Expression', axis=1, level=1)
+    mirna_loading = pd.read_csv(snakemake.input['mirna_loading'], sep='\t', index_col=list(range(6)))
+    mirna_loading.index = mirna_loading.index.get_level_values(0)
+    mirna_loading = mirna_loading[['RIP_E14_AGO2', 'RIP_E14_AGO1']].mean(axis=1)
     ago2_heap_data = pd.read_csv(snakemake.input['ago2_heap_data'], index_col=0)  # of note, 6mers are not filtered here!
 
     # this leads to:  numpy/lib/arraysetops.py:580: FutureWarning: elementwise comparison failed; returning scalar instead,
@@ -29,7 +32,7 @@ try:
     expressed_genes = set(expr.index[(expr > snakemake.params['min_mrna_expression']).any(axis=1)])
 
     # get potential mirna interactors
-    mirna_wt_expression = mirna_expression['WT']
+    # mirna_wt_expression = mirna_expression['WT']
 
     def _sum_scores(l, ascending=False):
         '''
@@ -85,7 +88,7 @@ try:
         lambda row: ','.join(row.index[row].map(lambda i: i[:2])),
         axis=1).values
 
-    df['WT miRNA expression'] = mirna_wt_expression.reindex(df.index.get_level_values(1)).values
+    df['WT miRNA loading'] = mirna_loading.reindex(df.index.get_level_values(1)).values
     df['WT mRNA expression']  = expr.reindex(df.index.get_level_values(0))['WT'].fillna(0.0).values
 
     # Beautify data frame a bit before export

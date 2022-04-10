@@ -29,7 +29,7 @@ elif snakemake.wildcards['subset'] != 'all':
 df *= (1e6/df.sum())  # CPM normalization
 
 fig, ax = plt.subplots(figsize=(6, 3.5))
-ax, explained_variance = pcaplot(df, scaling='standard', ax=ax, cmap=cmap)
+ax, explained_variance = pcaplot(df, scaling='log2', ax=ax, cmap=cmap)
 
 # formatting
 ax.get_legend().remove()

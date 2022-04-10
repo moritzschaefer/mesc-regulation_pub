@@ -61,7 +61,7 @@ df = df.groupby(['Geneid', 'Gene name', 'seed', 'miRNA family']).agg({
     'Interaction score': 'max',
     'mESC specific miRNA': lambda group: 'yes' if np.mean(group) >= 0.5 else 'no',
     'weighted context++ score': 'min',
-    'WT miRNA expression': 'sum'
+    'WT miRNA loading': 'sum'
 })
 
 # Upregulation Score (border size is upregulation-pvalue)
@@ -73,7 +73,7 @@ df = df.reset_index()
 wt_tpm = mrna_data[('WT', 'tpm_expression')]
 wt_tpm.index = wt_tpm.index.droplevel(1)
 df['WT gene expression'] = np.log2(wt_tpm.loc[df['Geneid']] + 1).values
-df['WT miRNA expression'] = np.log2(df['WT miRNA expression'] + 1)
+df['WT miRNA loading'] = np.log2(df['WT miRNA loading'] + 1)
 
 # node type: TF or not
 df = df
@@ -102,11 +102,11 @@ for key in graph.nodes:
         values['expression'] = values['WT gene expression']
     except IndexError:
         values = df[df['miRNA family'] == key].iloc[0][[
-            'WT miRNA expression',
+            'WT miRNA loading',
             'mESC specific miRNA'
         ]]
         values['type'] = 'miRNA'
-        values['expression'] = values['WT miRNA expression']
+        values['expression'] = values['WT miRNA loading']
         values['mesc_specific'] = values['mESC specific miRNA']
     graph.nodes[key].update(**values.to_dict())
 

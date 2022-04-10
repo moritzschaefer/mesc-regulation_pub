@@ -104,7 +104,7 @@ rule plot_target_mirna_expr:
         import seaborn as sns
 
         interaction_df = pd.read_csv(input['interaction_data'])
-        unfiltered_interaction_df = pd.read_csv(input['unfiltered_interaction_data']).query(f'`WT miRNA expression` > {params.mirna_threshold}')
+        unfiltered_interaction_df = pd.read_csv(input['unfiltered_interaction_data']).query(f'`WT miRNA loading` > {params.mirna_threshold}')
         mirnas = interaction_df.loc[interaction_df['Gene name'] == wildcards['gene'],'miRNA']
 
         wt_expr = pd.read_csv(input['mirna_data'], header=[0, 1], index_col=0)[('WT','Expression')]
@@ -115,7 +115,7 @@ rule plot_target_mirna_expr:
         fig, ax = plt.subplots(figsize=(1.7, 1.7))
 
         if params['plot_non_heaps']:
-            for val in unfiltered_interaction_df.loc[unfiltered_interaction_df['Gene name'] == wildcards['gene'], 'WT miRNA expression']:
+            for val in unfiltered_interaction_df.loc[unfiltered_interaction_df['Gene name'] == wildcards['gene'], 'WT miRNA loading']:
                 ax.axvline(np.log2(val + 1), color='#D1e8ff')
 
         for mirna in mirnas:
@@ -161,7 +161,7 @@ rule plot_target_log2fc:
         log2fc.columns = ['Drosha_KO', 'Dicer_KO', 'Ago2&1_KO']
 
         gene_data = log2fc.loc[wildcards['gene']]
-        color_list = cmap(norm(gene_data))
+        color_list = cmap(norm(gene_data.values))
         fig, ax = plt.subplots(figsize=(2, 2))
 
         gene_data.plot.bar(color=color_list, ax=ax)
@@ -189,7 +189,7 @@ rule plot_target_context_score:
 
         interaction_df = pd.read_csv(input['interaction_data'])
         interactions = interaction_df.loc[interaction_df['Gene name'] == wildcards['gene'], 'weighted context++ score']
-        unfiltered_interaction_df = pd.read_csv(input['unfiltered_interaction_data']).query(f'`WT miRNA expression` > {params.mirna_threshold}')
+        unfiltered_interaction_df = pd.read_csv(input['unfiltered_interaction_data']).query(f'`WT miRNA loading` > {params.mirna_threshold}')
         # ts_scores = pd.read_csv(input['targetscan_scores'])
 
         fig, ax = plt.subplots(figsize=(1.7, 1.7))

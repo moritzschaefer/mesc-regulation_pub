@@ -55,13 +55,14 @@ rule combine_direct_mirna_interactions:
         mrna_data='output/mrna_data_{subset}.csv',
         ago2_heap_data='output/ago2_heap_mesc_mres.csv',
         targetscan_prediction="output/targetscan_pairs.csv",  # downloads.smk
-        mirna_expression='output/mirna_data.csv',
+        #  mirna_expression='output/mirna_data.csv',
+        mirna_loading='/home/moritz/wiki/roam/data/9b/cfb83b-64ce-43d0-8692-8b53facd0094/mirbase_mmu21.cpm.tsv',  # TODO
         annotation='ref/gencode.db', # TODO 'chr' should be added in prepare_targetscan
     output:
         main='output/mirnas/raw_mirna_interactions_{subset,(all|protein_coding)}.csv'
     params:
         mutants=config['full_effect_mutants'],
-        padj_threshold=config['padj_threshold'],
+        combined_padj_threshold=config['padj_threshold'],
         log2fc_threshold=config['log2fc_threshold'],
         min_mrna_expression=config['mrna_threshold']
     conda: '../env/python.yaml'

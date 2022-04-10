@@ -30,6 +30,7 @@ rule supp_tables:
         'output/sipool/read_counts.tsv',
         'output/rnai_read_counts.tsv',
 
+# TODO fix all of them
 rule figure1:
     input:
         'plot/misregulation_pairplot_all.svg',
@@ -43,7 +44,7 @@ rule figure1:
 
 rule figure2:
     input:
-        expand('plot/target_data/{plot}_{gene}.pdf', plot=['track', 'target_log2fc'], gene=['Tfap4', 'Axin2', 'Rps26', 'Ctcf', 'Apoe']),
+        expand('plot/target_data/{plot}_{gene}.pdf', plot=['track', 'target_log2fc'], gene=['Tfap4', 'Axin2', 'Rps26', 'Ctcf', 'Apoe',]), # TODO e.g.
         'plot/feature_combination_count_horizontal.svg'
 
 rule figure3:

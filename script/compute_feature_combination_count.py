@@ -31,7 +31,7 @@ try:
 
     filters = {
         'AGO2 binding': lambda row: row['AGO2 HEAP peak'] > 0,
-        'WT miRNA expression': lambda row: row['WT miRNA expression'] > snakemake.params['min_mirna_expression'],
+        'WT miRNA loading': lambda row: row['WT miRNA loading'] > snakemake.params['min_mirna_expression'],
         'Mutant upregulation': lambda row: up_genes.get(row.name[0], False),
         'TargetScan score': lambda row: (row['weighted context++ score'] < snakemake.params['max_ts_score']) or
                               ((not row['is_3putr']) and (row['MRE type'] in ['7merm8', '8mer']))
@@ -70,7 +70,7 @@ try:
     for i, (filter_name, filtered_df) in enumerate(filtered_dfs.items()):
         filtered_df.reset_index().set_index(['Geneid', 'Gene name', 'miRNA'])[[
             'weighted context++ score', 'gene_location', 'AGO2 HEAP peak',
-             'upregulated mutants', 'WT miRNA expression', 'WT mRNA expression', 'Interaction score'
+             'upregulated mutants', 'WT miRNA loading', 'WT mRNA expression', 'Interaction score'
         ]].to_excel(writer, sheet_name=f'Filtering {i+1}', startrow=1, index=True)
 
         filters = filter_name.split('_')

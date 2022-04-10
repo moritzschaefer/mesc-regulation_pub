@@ -70,29 +70,31 @@ target_params:
   #   start: 32353813
   #   end: 32355267
   #   strand: '-'
-  Tfap4:
-    chr: '16'
-    start: 4544545
-    end: 4545861
-    strand: '-'
+  # Tfap4:  # TODO make separate plot
+  #   chr: '16'
+  #   start: 4544545
+  #   end: 4545861
+  #   strand: '-'
   Apoe:   # positive example (HEAP-peak in CDS)
     chr: '7'
     start: 19696000
     end: 19697900
     strand: '-'
-  # Ubxn1:   # positive example
-  #   chr: 19
-  #   start: 8873400
-  #   end: 8876130
-  #   strand: '+'
-  # Mt1:   # positive example
-  #   chr: 8
-  #   start: 94179800
-  #   end: 94180350
-  # Prr13:   # positive example
-  #   chr: 15
-  #   start: 102462100
-  #   end: 102462940
+  Ubxn1:   # positive example
+    chr: '19'
+    start: 8873400
+    end: 8876130
+    strand: '+'
+  Mt1:   # positive example
+    chr: '8'
+    start: 94179800
+    end: 94180350
+    strand: '+'
+  Prr13:   # positive example
+    chr: '15'
+    start: 102462100
+    end: 102462940
+    strand: '+'
   Axin2:   # negative example
     chr: '11'
     start: 108949100
@@ -138,6 +140,12 @@ target_params:
     start: 128624190
     end: 128625000
     strand: '-'
+  Cdkn1a:
+    chr: '17'
+    start: 29090976
+    end: 29100727
+    strand: '+'
+
 
 # other negative candidates:
 # - Lag3

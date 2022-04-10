@@ -42,7 +42,7 @@ try:
                 subdf = subdf[subdf.index.get_level_values(0).isin(up_genes.get_level_values(0))]
 
             # filter for miRNA expression
-            subdf = subdf.loc[subdf['WT miRNA expression'] > snakemake.params['min_mirna_expression']]
+            subdf = subdf.loc[subdf['WT miRNA loading'] > snakemake.params['min_mirna_expression']]
             # filter for context++ score
 
             # TargetScan filtering

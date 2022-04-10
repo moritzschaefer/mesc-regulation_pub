@@ -97,7 +97,7 @@ if snakemake.params['plot_upregulation_predictions']:
 
 colors = snakemake.params['sample_colors'][mutant]
 # Supp. figure: Interaction score has potential to improve predictions
-unfiltered_interaction_df = pd.read_csv(snakemake.input['unfiltered_interaction_data']).query(f'`WT miRNA expression` > {snakemake.params.mirna_threshold}')
+unfiltered_interaction_df = pd.read_csv(snakemake.input['unfiltered_interaction_data']).query(f'`WT miRNA loading` > {snakemake.params.mirna_threshold}')
 # Use 'Interaction score' for ranking miRNA target genes with the simple formulae: max(interaction_scores) + (log10(n) + 1) * (sum(interactions_scores)/n)
 score_filtered = unfiltered_interaction_df.groupby('Geneid')['Interaction score'].agg(lambda group: group.max() + (np.log10(len(group)) + 1) * group.mean()).sort_values(ascending=False).iloc[:n_genes]
 score_filtered.index.to_series().to_csv(snakemake.output.score_filtered_targets)

@@ -16,7 +16,7 @@ def score(df, padj, log2fc, padj_threshold):
             (log2fc.loc[df.index.droplevel([2, 3, 4])] > 0)
         ).sum(axis=1)).values / 4
 
-    score_df['wt_mirna_expression'] = MinMaxScaler().fit_transform(X=np.log2(df['WT miRNA expression'] + 1).values.reshape(-1, 1))
+    score_df['wt_mirna_expression'] = MinMaxScaler().fit_transform(X=np.log2(df['WT miRNA loading'] + 1).values.reshape(-1, 1))
     # MRE score is a bit more complicated because of the noncoding genes (they dont have a context++-score)
     cs = df['weighted context++ score']
     score_df['mre_score'] = MinMaxScaler().fit_transform(-cs.values.reshape(-1, 1))
