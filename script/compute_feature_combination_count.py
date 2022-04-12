@@ -64,13 +64,13 @@ try:
     num_genes = pd.Series(index=pd.MultiIndex.from_frame(index),
                           data=data.values)
     num_genes.to_csv(snakemake.output['counts'])
-    # generate excel sheet, put number of genes, number of interactions and wich filtering was used in the headline
+    # generate excel sheet, put number of genes, number of interactions and which filtering was used in the headline
 
     writer = pd.ExcelWriter(snakemake.output['interactions'], engine='xlsxwriter')
     for i, (filter_name, filtered_df) in enumerate(filtered_dfs.items()):
         filtered_df.reset_index().set_index(['Geneid', 'Gene name', 'miRNA'])[[
             'weighted context++ score', 'gene_location', 'AGO2 HEAP peak',
-             'upregulated mutants', 'WT miRNA loading', 'WT mRNA expression', 'Interaction score'
+            'upregulated mutants', 'WT miRNA loading', 'WT mRNA expression', 'Interaction score'
         ]].to_excel(writer, sheet_name=f'Filtering {i+1}', startrow=1, index=True)
 
         filters = filter_name.split('_')

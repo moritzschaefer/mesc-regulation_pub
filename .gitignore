@@ -11,6 +11,7 @@ stats/
 *.org/
 Enrichr/
 /sunlab.cpy.cuhk.edu.hk/
+*.gtf
 
 *.fa
 *.fa.fai

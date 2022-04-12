@@ -55,14 +55,14 @@ rule combine_direct_mirna_interactions:
         mrna_data='output/mrna_data_{subset}.csv',
         ago2_heap_data='output/ago2_heap_mesc_mres.csv',
         targetscan_prediction="output/targetscan_pairs.csv",  # downloads.smk
-        #  mirna_expression='output/mirna_data.csv',
-        mirna_loading='/home/moritz/wiki/roam/data/9b/cfb83b-64ce-43d0-8692-8b53facd0094/mirbase_mmu21.cpm.tsv',  # TODO
+        #  mirna_expression='output/TableS2_RIP-seq.xlsx',
+        mirna_data='output/TableS2_RIP-seq.xlsx',
         annotation='ref/gencode.db', # TODO 'chr' should be added in prepare_targetscan
     output:
         main='output/mirnas/raw_mirna_interactions_{subset,(all|protein_coding)}.csv'
     params:
         mutants=config['full_effect_mutants'],
-        combined_padj_threshold=config['padj_threshold'],
+        combined_padj_threshold=config['combined_padj_threshold'],
         log2fc_threshold=config['log2fc_threshold'],
         min_mrna_expression=config['mrna_threshold']
     conda: '../env/python.yaml'
@@ -88,7 +88,7 @@ rule rank_direct_mirna_interactions:
         max_ts_score=config['ts_threshold'],
         min_mirna_expression=config['mirna_threshold'],
         min_num_up_genes=config['min_num_up_genes'],
-        padj_threshold=config['combined_padj_threshold'],
+        combined_padj_threshold=config['combined_padj_threshold'],
         log2fc_threshold=config['log2fc_threshold']
     conda: '../env/python.yaml'
     script: '../script/direct_mirna_targets/rank_direct_mirna_interactions.py'
@@ -190,10 +190,59 @@ rule ms_validation:
 
 rule target_cluster_distribution:
     input:
-        mirna_data='output/mirna_data.csv',
+        mirna_data='output/TableS2_RIP-seq.xlsx',
         interaction_ranking='output/mirnas/interaction_ranking_{group}.csv'
     output:
         barplot='plot/target_cluster_distribution_barplot_{group}.svg',
         pieplot='plot/target_cluster_distribution_pieplot_{group}.svg'
     conda: '../env/python.yaml'
     script: '../script/target_cluster_distribution.py'
+
+rule cooperative_mirna_binding:
+    input:
+        interaction_ranking='output/mirnas/interaction_ranking_all.csv',
+        unfiltered_interactions='output/mirnas/unfiltered_interaction_ranking_all.csv',
+        ribo_data='output/TableS5_Ribo-seq.xlsx',
+        quantseq_data='output/cluster_kos/TableS6_miR-290-295KO_Quant-seq.xlsx',
+        ago2_heap_peaks=remote_file('https://www.ncbi.nlm.nih.gov/geo/download/?acc=GSE139345&format=file&file=GSE139345_mESC_peaks.csv.gz', gunzip=True)
+    output:
+        heap_for_num_mres='plot/heap_for_num_mres.svg',
+        interaction_count_ribo='plot/interaction_count_ribo.svg',
+        interaction_count_mir290='plot/interaction_count_mir290.svg'
+    params:
+        mre_count_bins=config['mre_count_bins'],
+        mutants=config['full_effect_mutants'],
+        ts_mre_count_bins=config['ts_mre_count_bins'],
+        mirna_threshold=config['mirna_threshold'],
+        sample_colors=config['sample_colors']
+    conda: '../env/python.yaml'
+    script:
+        '../script/cooperative_mirna_binding.py'
+
+rule database_overlap:
+    input:
+        interaction_ranking='output/mirnas/interaction_ranking_all.csv',
+        mtb_mmu=HTTP.remote('https://mirtarbase.cuhk.edu.cn/~miRTarBase/miRTarBase_2022/cache/download/8.0/mmu_MTI.xls', keep_local=True, static=True),
+        mirna_data='output/TableS2_RIP-seq.xlsx',
+    output:
+        'plot/mirtarbase_overlap.svg'
+    params:
+        mirna_threshold=config['mirna_threshold']
+    conda: '../env/python.yaml'
+    script:
+        '../script/database_overlap.py'
+
+rule interaction_stats:
+    input:
+        interaction_ranking='output/mirnas/interaction_ranking_all.csv',
+    output:
+        interaction_histo='plot/interaction_count_histo.svg',
+        gene_expression='plot/interaction_count_gene_expr.svg',
+        mrna_sections='plot/interaction_count_mrna_sections.svg',
+        mre_type='plot/interaction_count_mre_type.svg'
+    params:
+        mre_count_bins=config['mre_count_bins'],
+    conda: '../env/python.yaml'
+    script:
+        '../script/interaction_stats.py'
+

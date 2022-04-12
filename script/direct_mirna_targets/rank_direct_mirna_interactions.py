@@ -14,12 +14,12 @@ try:
     tpm = mrna_data.xs('tpm_expression', axis=1, level=1)
 
     up_genes = mrna_data.index[((log2fc > snakemake.params['log2fc_threshold']) &
-                                (padj < snakemake.params['padj_threshold'])).sum(axis=1) >= snakemake.params['min_num_up_genes']]
+                                (padj < snakemake.params['combined_padj_threshold'])).sum(axis=1) >= snakemake.params['min_num_up_genes']]
     low_up_genes = mrna_data.index[(tpm > 1).any(axis=1) & (((log2fc > 0.1) & (log2fc < 0.5)).sum(axis=1) == len(snakemake.params['mutants']))]
     # low_up_genes = mrna_data.index[((log2fc > 0.1) & (log2fc < 0.5)).sum(axis=1) >= snakemake.params['min_num_up_genes']]
 
     down_genes = mrna_data.index[((log2fc < snakemake.params['log2fc_threshold']) &
-                                  (padj < snakemake.params['padj_threshold'])).sum(axis=1) >= snakemake.params['min_num_up_genes']]
+                                  (padj < snakemake.params['combined_padj_threshold'])).sum(axis=1) >= snakemake.params['min_num_up_genes']]
 
     with open(snakemake.output.up_genes, 'w') as f:
         f.write(','.join(up_genes.get_level_values(0)))
@@ -51,14 +51,14 @@ try:
                               ((~subdf['is_3putr'].astype(bool)) & (subdf['MRE type'].isin(['7merm8', '8mer'])))]
 
         # Scorify (0.0-1.0) our features
-        score_df, gene_order = score(subdf, padj, log2fc, snakemake.params['padj_threshold'])
+        score_df, gene_order = score(subdf, padj, log2fc, snakemake.params['combined_padj_threshold'])
         subdf = subdf.loc[score_df.index]
         subdf['Interaction score'] = score_df['interaction_score']
         subdf.reset_index().to_csv(filename, index=False)
 
         if filtered is True:
             # also store the by-gene-grouped ranking
-            gene_order.index = pd.MultiIndex.from_arrays([gene_order.index, gene_order.index.map(lambda i: mrna_data.reset_index(level=1, drop=False).loc[i, 'level_1'][0])])
+            gene_order.index = pd.MultiIndex.from_arrays([gene_order.index, gene_order.index.map(lambda i: mrna_data.reset_index(level=1, drop=False).loc[i, 'Gene Name'][0])])
             gene_order.index.rename('Gene name', level=1, inplace=True)
             gene_order.name = 'score'
 

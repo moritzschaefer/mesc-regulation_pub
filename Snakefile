@@ -14,12 +14,24 @@ include: 'rules/tf_annotation.smk'
 include: 'rules/cluster_kos.smk'
 include: 'rules/sipool.smk'
 include: 'rules/figure_plots.smk'
+include: 'rules/clip_plots.smk'
 
+
+include: 'rules/figures.smk'  # in this file, figure-files are defined on a per-figure basis
+rule all:
+    input:
+        rules.figure1.input,
+        rules.figure2.input,
+        rules.figure3.input,
+        rules.figure4.input
+
+
+# TODO maybe delete this rule? the supp. tables were generated manually in any case.
 # The order of the supp tables might have changed in the final publication. Also, some sheets might have been added manually
 rule supp_tables:
     input:
-        'output/TableS1_RNA-seq.xlsx',
-        'output/TableS2_sRNA-seq.xlsx',
+        # 'output/TableS1_RNA-seq.xlsx',  # generated manually
+        # 'output/TableS2_RIP-seq.xlsx',  # generated manually
         'output/TableS3_Integrative_analysis.xlsx',
         'output/TableS5_Ribo-seq.xlsx',
         'output/TableS4_FullProteome.xlsx',
@@ -30,35 +42,6 @@ rule supp_tables:
         'output/sipool/read_counts.tsv',
         'output/rnai_read_counts.tsv',
 
-# TODO fix all of them
-rule figure1:
-    input:
-        'plot/misregulation_pairplot_all.svg',
-        'plot/mirna_cdf.svg',
-        'plot/ma_all.svg',
-        'plot/mirna_pca.svg',
-        'plot/mrna_pca.svg',
-        'plot/transcript_correlation.svg',
-        'plot/gene_upregulation.svg',
-        'plot/gene_downregulation.svg'
-
-rule figure2:
-    input:
-        expand('plot/target_data/{plot}_{gene}.pdf', plot=['track', 'target_log2fc'], gene=['Tfap4', 'Axin2', 'Rps26', 'Ctcf', 'Apoe',]), # TODO e.g.
-        'plot/feature_combination_count_horizontal.svg'
-
-rule figure3:
-    input:
-        'plot/ribo_seq_validation_all.svg',
-        'plot/ms_validation_all.svg',
-        'plot/target_cluster_distribution_barplot_all.svg',
-        'plot/cluster_kos/ma_miR-290-295_all.svg',
-        'plot/cluster_kos/target_cdf_miR-290-295.svg',
-
-rule figure4:
-    input:
-        'plot/sipool/target_rescue.svg',
-        'plot/mir_290_regulated_tfs.svg'
 
 ## RNA-seq
 rule rnai_read_count_matrix:
@@ -86,16 +69,6 @@ rule combine_mrna_data:
         csv='output/mrna_data_all.csv',
         supp_table='output/TableS1_RNA-seq_rna_seq.xlsx',
     script: 'script/combine_mrna_data.py'
-
-# relies on moritzsphd.data
-rule combine_mirna_data:
-    conda: 'env/python.yaml'
-    output:
-        csv='output/mirna_data.csv',
-        supp_table='output/TableS2_sRNA-seq.xlsx'
-    params:
-        mutants=config['full_effect_mutants']
-    script: 'script/combine_mirna_data.py'
 
 rule filter_protein_coding:
     '''

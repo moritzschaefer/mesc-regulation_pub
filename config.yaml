@@ -60,21 +60,11 @@ ts_threshold: -0.00
 
 # for figure 2
 target_params:
-  Zic2:
-    chr: '14'
-    start: 122478858
-    end: 122480347
-    strand: '+'
-  # Wiz:
-  #   chr: '17'
-  #   start: 32353813
-  #   end: 32355267
-  #   strand: '-'
-  # Tfap4:  # TODO make separate plot
-  #   chr: '16'
-  #   start: 4544545
-  #   end: 4545861
-  #   strand: '-'
+  Tfap4:
+    chr: '16'
+    start: 4544545
+    end: 4545861
+    strand: '-'
   Apoe:   # positive example (HEAP-peak in CDS)
     chr: '7'
     start: 19696000
@@ -100,42 +90,12 @@ target_params:
     start: 108949100
     end: 108950900
     strand: '+'
-  # Thsd1:   # negative example
-  #   chr: '8'
-  #   start: 22256000
-  #   end: 22262500
-  #   strand: '+'
-  # Zfp85:  # negative example
-  #   chr: '13'
-  #   start: 67747000
-  #   end: 67750000
-  #   strand: '-'
-  # Pipox:  # delete
-  #   chr: '11'
-  #   start: 77880455
-  #   end: 77881951
-  #   strand: '-'
-  # Aars:
-  #   chr: '8'
-  #   start: 111054117
-  #   end: 111057874
-  #   strand: '+'
   Ctcf:
     chr: '8'
     start: 105681183
     end: 105683084
     strand: '+'
-  Gdf15:  # too much peak in 3'UTR
-    chr: '8'
-    start: 70629154
-    end: 70632615
-    strand: '-'
-  # Mvp:
-  #   chr: '7'
-  #   start: 126985580
-  #   end: 126990567 
-  #   strand: '-'
-  Rps26: # chosen
+  Rps26:
     chr: '10'
     start: 128624190
     end: 128625000
@@ -146,6 +106,8 @@ target_params:
     end: 29100727
     strand: '+'
 
+mre_count_bins: [1, 2, 5, 10, 20]
+ts_mre_count_bins: [1, 2, 5, 25, 100]
 
 # other negative candidates:
 # - Lag3

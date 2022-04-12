@@ -3,8 +3,7 @@
 rule all:
     input:  # Data from Supp. Tables 6 and 7 are not required for running any scripts
         'output/mrna_data_all.csv',
-        'output/mirna_data.csv',
-        'output/TableS2_sRNA-seq.xlsx',
+        'output/TableS2_RIP-seq.xlsx',
         'output/TableS5_Ribo-seq.xlsx',
         'output/TableS4_FullProteome.xlsx',
         'output/cluster_kos/TableS6_miR-290-295KO_Quant-seq.xlsx',
@@ -26,23 +25,11 @@ rule mrna_data_all:
         df = df.rename(columns={'Ago2&1':'Ago12'})
         df.to_csv(output[0])
 
-rule mirna_data:
-    input:
-        'supp/TableS2_sRNA-seq.xlsx'
-    output:
-        'output/mirna_data.csv',
-    run:
-        import pandas as pd
-        df = pd.read_excel(input[0], skiprows=2, index_col=0, header=[0, 1])
-        # source code compatibility
-        df = df.rename(columns={'Ago2&1':'Ago12'})
-        df.to_csv(output[0])
-
 rule supp_table_s2:
     input:
-        'supp/TableS2_sRNA-seq.xlsx'
+        'supp/TableS2_RIP-seq.xlsx'
     output:
-        'output/TableS2_sRNA-seq.xlsx'
+        'output/TableS2_RIP-seq.xlsx'
     shell: '''
         cp {input} {output}
     '''

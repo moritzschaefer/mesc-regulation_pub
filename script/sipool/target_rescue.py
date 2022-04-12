@@ -60,7 +60,7 @@ for gene, ax in zip(genes, axes[0, :]):
 fig.tight_layout()
 fig.savefig(snakemake.output['plot_png'])
 fig.savefig(snakemake.output['plot_svg'])
-mir290de_genes['Gene Name'] = mir290de_genes.index.map(gid2n)
+mir290de_genes['Gene name'] = mir290de_genes.index.map(gid2n)
 mir290de_genes.index.name = 'Geneid'
-mir290de_genes.set_index('Gene Name', append=True, inplace=True)
+mir290de_genes.set_index('Gene name', append=True, inplace=True)
 mir290de_genes.to_csv(snakemake.output['rescue_df'])

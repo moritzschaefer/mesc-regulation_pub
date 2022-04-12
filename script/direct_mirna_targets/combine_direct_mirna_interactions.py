@@ -12,9 +12,8 @@ try:
     mrna_data = mrna_data[snakemake.params['mutants'] + ['WT']]
     # mirna_expression = pd.read_csv(snakemake.input['mirna_expression'], index_col=0, header=[0, 1]) \
     #     .xs('Expression', axis=1, level=1)
-    mirna_loading = pd.read_csv(snakemake.input['mirna_loading'], sep='\t', index_col=list(range(6)))
-    mirna_loading.index = mirna_loading.index.get_level_values(0)
-    mirna_loading = mirna_loading[['RIP_E14_AGO2', 'RIP_E14_AGO1']].mean(axis=1)
+
+    mirna_loading = pd.read_excel(snakemake.input['mirna_data'], skiprows=2, index_col=0)[['RIP_AGO2', 'RIP_AGO1']].mean(axis=1)
     ago2_heap_data = pd.read_csv(snakemake.input['ago2_heap_data'], index_col=0)  # of note, 6mers are not filtered here!
 
     # this leads to:  numpy/lib/arraysetops.py:580: FutureWarning: elementwise comparison failed; returning scalar instead,
@@ -93,7 +92,8 @@ try:
 
     # Beautify data frame a bit before export
     df.rename(columns={'conserved': 'MRE conserved', 'score': 'AGO2 HEAP peak'}, inplace=True)
-    df['Gene name'] = mrna_data.index.to_frame().reset_index(drop=True).set_index(0)[1].reindex(df.index.get_level_values(0)).values
+    df['Gene name'] = mrna_data.index.to_frame().reset_index(drop=True).set_index('Gene ID')['Gene Name'].reindex(df.index.get_level_values(0)).values
+
     df.set_index('Gene name', append=True, inplace=True)
 
     df = df.reorder_levels(['Geneid', 'Gene name', 'gene_location', 'start', 'end', 'miRNA'])

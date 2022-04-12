@@ -17,12 +17,41 @@ def _target_region(wildcards, output):
     region = config['target_params'][wildcards.gene]
     return f'{region["chr"]}:{region["start"]}-{region["end"]}'
 
+rule rip_ago1_ago2_comparison:
+    '''Similarity between Ago1- and Ago2-miRNA loading'''
+    input:
+        mirna_data='output/TableS2_RIP-seq.xlsx',
+    output:
+        'plot/rip_ago1_ago2_comparison.svg'
+    script:
+        '../script/rip_ago1_ago2_comparison.py'
+
+rule rip_input_comparison:
+    '''RIP vs Input comparison, indicates that some miRNAs are differentially loading as compared to expressed'''
+    input:
+        mirna_data='output/TableS2_RIP-seq.xlsx',
+    params:
+        padj_threshold=config['padj_threshold']
+    output:
+        'plot/rip_input_comparison.svg'
+    script:
+        '../script/rip_input_comparison.py'
+
+rule rip_mir290_loading:
+    '''miR-290-295-loading'''
+    input:
+        mirna_data='output/TableS2_RIP-seq.xlsx',
+    output:
+        'plot/rip_mir290_loading.svg'
+    script:
+        '../script/rip_mir290_loading.py'
+
 rule heap_mres:
     '''
     Filter HEAP MREs for miRNA expression and save as bed file
     '''
     input:
-        mirna_data='output/mirna_data.csv',
+        mirna_data='output/TableS2_RIP-seq.xlsx',
         ago2_heap_data='output/ago2_heap_mesc_mres.csv',
     params:
         min_mirna_expression=config['mirna_threshold'],
@@ -41,11 +70,11 @@ rule expressed_mres_bed:
     input:
         annotation='ref/gencode.db',
         config='config.yaml',  # if the config changes, this one should be recomputed
-        mirna_data='output/mirna_data.csv',
+        mirna_data='output/TableS2_RIP-seq.xlsx',
         heap_peaks=remote_file('https://www.ncbi.nlm.nih.gov/geo/download/?acc=GSE139345&format=file&file=GSE139345_mESC_peaks.csv.gz', gunzip=True)
     params:
         regions=config['target_params'],
-        min_mirna_expression=config['mirna_threshold'],
+        mirna_threshold=config['mirna_threshold'],
     output:
         'output/track_plots/expressed_mres.bed'
     conda:
@@ -71,7 +100,7 @@ rule plot_target_track:
         # these ones are part of the ini-file and therefore required
         # genes=remote_file(config['gencode_gtf'], with_extension=True, gunzip=True),
         # heap=remote_file('cclab:/home/schamori/HEAP-Ago2/heap_ratio.bw'),  # generated from https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE139345
-        # heap_peaks='output/track_plots/heap_peaks.bed',
+        heap_peaks='output/track_plots/heap_peaks.bed',
         # heap_mres='output/ago2_heap_mres.bed',
         # expressed_mres='output/track_plots/expressed_mres.bed',
     output:
@@ -87,7 +116,7 @@ rule plot_target_track:
 
 rule plot_target_mirna_expr:
     input:
-        mirna_data='output/mirna_data.csv',
+        mirna_data='output/TableS2_RIP-seq.xlsx',
         interaction_data='output/mirnas/interaction_ranking_all.csv',
         unfiltered_interaction_data='output/mirnas/unfiltered_interaction_ranking_all.csv'
     output:
@@ -107,10 +136,10 @@ rule plot_target_mirna_expr:
         unfiltered_interaction_df = pd.read_csv(input['unfiltered_interaction_data']).query(f'`WT miRNA loading` > {params.mirna_threshold}')
         mirnas = interaction_df.loc[interaction_df['Gene name'] == wildcards['gene'],'miRNA']
 
-        wt_expr = pd.read_csv(input['mirna_data'], header=[0, 1], index_col=0)[('WT','Expression')]
-        wt_expr = wt_expr[wt_expr > params['mirna_threshold']]
-        log_expr = np.log2(wt_expr + 1)
-        interaction_mirnas = log_expr.loc[mirnas]
+        mirna_loading = pd.read_excel(input['mirna_data'], skiprows=2, index_col=0)[['RIP_AGO2', 'RIP_AGO1']].mean(axis=1)
+        mirna_loading = mirna_loading[mirna_loading > params['mirna_threshold']]
+        log_loading = np.log2(mirna_loading + 1)
+        interaction_mirnas = log_loading.loc[mirnas]
 
         fig, ax = plt.subplots(figsize=(1.7, 1.7))
 
@@ -119,17 +148,17 @@ rule plot_target_mirna_expr:
                 ax.axvline(np.log2(val + 1), color='#D1e8ff')
 
         for mirna in mirnas:
-            ax.axvline(log_expr.loc[mirna], color='darkblue')
-            
-        sns.kdeplot(log_expr, ax=ax, color='gray')
+            ax.axvline(log_loading.loc[mirna], color='darkblue')
 
-        ax.set_xticks([0, max(log_expr)])
-        ax.set_xticklabels([0, int(max(wt_expr))])
+        sns.kdeplot(log_loading, ax=ax, color='gray')
+
+        ax.set_xticks([0, max(log_loading)])
+        ax.set_xticklabels([0, int(max(mirna_loading))])
         ax.set_yticklabels([])
         plt.grid(None)
         sns.despine()
         ax.set_ylabel('distribution')
-        ax.set_xlabel('expression')
+        ax.set_xlabel('loading')
         # ax.set_title('miRNA expression')
         ax.grid(None)
         plt.tight_layout()
@@ -243,11 +272,9 @@ rule plot_feature_combination_count:
     input:
         'output/feature_combination_count.csv'
     output:
-        'plot/feature_combination_count{direction}.svg'
+        'plot/feature_combination_count{direction}.pdf'
     conda: '../env/python.yaml'
     script: '../script/plot_feature_combination_count.py'
-
-rule plot_interaction_scores:
 
 rule plot_tf_overview:
     input:
@@ -260,4 +287,3 @@ rule plot_tf_overview:
         log2fc_threshold=config['log2fc_threshold'],
     conda: '../env/python.yaml'
     script: '../script/plot_tf_overview.py'
-

@@ -33,7 +33,7 @@ def process_count_table(count_table, clusters, show_n=10):
 clusters = mirbase_clusters()
 
 # *Compute cluster expression*
-df = pd.read_csv(snakemake.input['mirna_data'], index_col=0, header=[0, 1])[[('WT', 'Expression')]]
+df = pd.read_excel(snakemake.input['mirna_data'], skiprows=2, index_col=0)[['RIP_AGO2', 'RIP_AGO1']].mean(axis=1).to_frame()
 df.columns = ['count']
 
 num_clusters = 5

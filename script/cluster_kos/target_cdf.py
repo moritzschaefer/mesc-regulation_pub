@@ -11,7 +11,6 @@ clusters = mirbase_clusters()
 
 fig, ax = plt.subplots(figsize=(5.2, 3.2))
 fig2, ax2 = plt.subplots(figsize=(5.2, 3.2))
-fig3, ax3 = plt.subplots(figsize=(5.2, 3.2))
 
 # controls = []
 
@@ -37,7 +36,6 @@ non_target_deg = diffexp_df.loc[non_targets, 'log2FoldChange']
 
 sns.ecdfplot(target_deg, ax=ax, label=f'Integrative approach (n={len(target_deg)})', color=snakemake.params['sample_colors'][mutant])
 sns.ecdfplot(target_deg, ax=ax2, label=f'Integrative approach (n={len(target_deg)})', color=snakemake.params['sample_colors'][mutant])
-sns.ecdfplot(target_deg, ax=ax3, label=f'Integrative approach (n={len(target_deg)})', color=snakemake.params['sample_colors'][mutant])
 pd.Series({'num_targets': len(cluster_targets_minscore), 'num_up_targets': (target_deg > 0).sum(), 'ratio': (target_deg > 0).sum()/len(cluster_targets_minscore)}).to_csv(snakemake.output['up_percentage'], header=False)
 print(f'Mean target DEG: {target_deg.mean()}')
 
@@ -86,47 +84,27 @@ if snakemake.params['plot_upregulation_predictions']:
     print(f'Mean upreg DEG: {up_genes_deg.mean()}')
     print(f'Kolmogorov-Smirnov test between DEGs of {len(up_genes)} "commonly upregulated genes" vs the predictions from the paper\'s integrative approach: {kstest(up_genes_deg, target_deg)}')
 
-    # Supp. figure: Filtered up-genes
-    up_genes_filtered = pd.Index(up_genes).intersection(ts_df.gene_id)  # This is equivalent to mir-291/4/5-seed match search in 3p-UTR
-    up_genes_filtered_deg = diffexp_df.loc[up_genes_filtered, 'log2FoldChange']
-    sns.ecdfplot(up_genes_filtered_deg, ax=ax2,
-                 label=f'filtered RNAi_KO-upregs (n={len(up_genes_filtered)})', color='#60cda5')
-
-    print(f'Mean filtered upreg DEG: {up_genes_filtered_deg.mean()}')
-    print(f'Kolmogorov-Smirnov test between DEGs of {len(up_genes_filtered)} "commonly upregulated genes" filtered for miR-291/294/295 binding sites (seed match AAGUGCU) vs the predictions from the paper\'s integrative approach: {kstest(up_genes_filtered_deg, target_deg)}')
-
 colors = snakemake.params['sample_colors'][mutant]
-# Supp. figure: Interaction score has potential to improve predictions
-unfiltered_interaction_df = pd.read_csv(snakemake.input['unfiltered_interaction_data']).query(f'`WT miRNA loading` > {snakemake.params.mirna_threshold}')
-# Use 'Interaction score' for ranking miRNA target genes with the simple formulae: max(interaction_scores) + (log10(n) + 1) * (sum(interactions_scores)/n)
-score_filtered = unfiltered_interaction_df.groupby('Geneid')['Interaction score'].agg(lambda group: group.max() + (np.log10(len(group)) + 1) * group.mean()).sort_values(ascending=False).iloc[:n_genes]
-score_filtered.index.to_series().to_csv(snakemake.output.score_filtered_targets)
-
-score_filtered_deg = diffexp_df.loc[score_filtered.index, "log2FoldChange"]
-sns.ecdfplot(score_filtered_deg, ax=ax2, label=f'Interaction score-based filter (n={len(score_filtered)})', color='#0000FF')
-print(f'Mean for interaction-score-filtered targets: {score_filtered_deg.mean()}')
-print(f'Kolmogorov-Smirnov test between DEGs of {len(score_filtered)} Interaction-score-filtered targets vs the predictions from the paper\'s integrative approach: {kstest(score_filtered_deg, target_deg)}')
 
 # plot low_up_genes
 with open(snakemake.input.low_up_genes, 'r') as f:
     low_up_genes = f.read().strip('\n').split(',')
 low_up_genes_deg = diffexp_df.loc[low_up_genes, "log2FoldChange"]
 print(f'Mean for low_up_genes_deg: {low_up_genes_deg.mean()}')
-sns.ecdfplot(low_up_genes_deg, ax=ax3, label=f'lowly upregulated genes (n={len(low_up_genes)})', color='#7ec0ee')
+sns.ecdfplot(low_up_genes_deg, ax=ax2, label=f'lowly upregulated genes (n={len(low_up_genes)})', color='#7ec0ee')
 
 low_predictions = pd.read_csv(snakemake.input['low_mirna_targets'], index_col=[0, 1, 2, 3, 4, 5])
 low_cluster_predictions = low_predictions.loc[low_predictions.apply(lambda row: row.name[5] in target_cluster, axis=1)]
 low_cluster_targets = low_cluster_predictions.groupby(low_cluster_predictions.index.get_level_values(0))['Interaction score'].sum().sort_values(ascending=False)  # irrelevant
 low_target_deg = diffexp_df.loc[low_cluster_targets.index, 'log2FoldChange']
 print(f'Mean for integrative-filtered low_up_genes_deg: {low_target_deg.mean()}')
-sns.ecdfplot(low_target_deg, ax=ax3, label=f'Low-up genes + Integrative approach (n={len(low_target_deg)})', color='#Ff7f50')
-print(f'Kolmogorov-Smirnov test between DEGs of {len(score_filtered)} low-up-genes vs filtered low-up-genes: {kstest(low_up_genes_deg, low_target_deg)}')
+sns.ecdfplot(low_target_deg, ax=ax2, label=f'Low-up genes + Integrative approach (n={len(low_target_deg)})', color='#Ff7f50')
 
 # other control (can be shown optionally)
 # sns.ecdfplot(non_target_deg, ax=ax, label=f'non-miR-290-295 predicted target, (n={len(non_target_deg)})', color='black')
 
 # just take the last one as control and format plot a little
-for f, axis, output_label in zip([fig, fig2, fig3], [ax, ax2, ax3], ['plot', 'supp_plot', 'low_up_supp_plot']):
+for f, axis, output_label in zip([fig, fig2], [ax, ax2], ['plot', 'low_up_supp_plot']):
     sns.ecdfplot(diffexp_df.loc[diffexp_df.baseMean > 100, 'log2FoldChange'].tolist(), ax=axis, label='expressed genes (control)', color='gray')
 
     axis.set_xlim([-0.5, 1.6])

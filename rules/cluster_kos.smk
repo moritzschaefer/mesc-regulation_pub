@@ -30,14 +30,11 @@ rule cluster_target_cdf:
         up_genes='output/up_genes_all.txt',
         low_up_genes='output/low_up_genes_all.txt',
         ago2_heap='output/ago2_heap_mesc_mres.csv',
-        unfiltered_interaction_data='output/mirnas/unfiltered_interaction_ranking_all.csv',
         mrna_data='output/mrna_data_all.csv'
     output:
         plot='plot/cluster_kos/target_cdf_{cluster}.svg',
-        supp_plot='plot/cluster_kos/target_cdf_supp_{cluster}.svg',
         low_up_supp_plot='plot/cluster_kos/low_up_cdf_supp_{cluster}.svg',
         up_percentage='output/cluster_percentage_{cluster}.txt',
-        score_filtered_targets='output/score_filtered_targets_{cluster}.csv'  # this is just a side product
     params:
         sample_colors=config['sample_colors'],
         mirna_threshold=config['mirna_threshold'],

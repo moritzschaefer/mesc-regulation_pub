@@ -1,49 +1,31 @@
-# TODO take from [[id:59330f09-5bfa-4be9-9a5e-c52f2a81870e][Revision plots for miRNA target prediction paper]]
-library(eulerr)
+import itertools
 
-# hacky
-df.col.readnames <- c("Geneid", "Genename",
-                      "Drosha_tpm", "Drosha_log2FoldChange", "Drosha_padj",
-                      "Dicer_tpm", "Dicer_log2FoldChange", "Dicer_padj",
-                      "Ago12_tpm", "Ago12_log2FoldChange", "Ago12_padj",
-                      "Ago1_tpm", "Ago1_log2FoldChange", "Ago1_padj",
-                      "Ago2_tpm", "Ago2_log2FoldChange", "Ago2_padj",
-                      "WT_2i_tpm", "WT_2i_log2FoldChange", "WT_2i_padj",
-                      "WT_tpm", "WT_log2FoldChange", "WT_padj")
+import matplotlib.pyplot as plt
+import pandas as pd
+import seaborn as sns
+from matplotlib_venn import venn3
 
-df.col.usenames <- c("Geneid", "Genename",
-                      "Drosha_tpm", "Drosha_log2FoldChange", "Drosha_padj",
-                      "Dicer_tpm", "Dicer_log2FoldChange", "Dicer_padj",
-                      "Ago12_tpm", "Ago12_log2FoldChange", "Ago12_padj",
-                      "WT_tpm", "WT_log2FoldChange", "WT_padj")
+df = pd.read_csv(snakemake.input.mrna_data, header=[0, 1], index_col=[0, 1])
+# df = df[snakemake.params['mutants']]
+# df = df.loc[(df.xs('tpm_expression', axis=1, level=1) > 1).any(axis=1)]  # filter lowly expression genes
+padj = df.xs('padj', axis=1, level=1)
+log2fc = df.xs('log2FoldChange', axis=1, level=1)
 
-df <- read.table(snakemake@input[[1]], sep=",", skip=2, col.names=df.col.readnames)
-df <- df[df.col.usenames]  # ignore ago single mutants
+mutants = snakemake.params.mutants
 
-mutants <- snakemake@params[["mutants"]]
+# up
+ups = ((padj < snakemake.params['combined_padj_threshold']) & (log2fc > snakemake.params['log2fc_threshold']))
+up_sets = [set(ups.index[ups[mutant]]) for mutant in mutants]
+c = venn3(up_sets, mutants)
+plt.savefig(snakemake.output.up)
+# c.get_patch_by_id('11').set_color('magenta')
+# c.get_patch_by_id('11').set_edgecolor('none')
+# c.get_patch_by_id('11').set_alpha(0.4)
+plt.subplots()
 
-# only select genes with minimal expression (say 0.5 tpm)
-mcols <- sapply(mutants, function(m) paste(m, "tpm", sep="_"))
-max_values <- apply(df[, mcols], 1, FUN=max)
-df <- df[max_values > 0.5, ]
-df <- df[complete.cases(df), ]  # drop nans
+# down
+downs = ((padj < snakemake.params['combined_padj_threshold']) & (log2fc < snakemake.params['log2fc_threshold']))
+down_sets = [set(downs.index[downs[mutant]]) for mutant in mutants]
+c = venn3(down_sets, mutants)
 
-# generate a matrix with true false values for our columns:
-log2fccols <- sapply(mutants, function(m) paste(m, "log2FoldChange", sep="_"))
-padjcols <- sapply(mutants, function(m) paste(m, "padj", sep="_"))
-if (snakemake@wildcards[["direction"]] == "up") {
-  mat <- (df[, log2fccols] > 0.5) & (df[, padjcols] < 0.05)
-} else {
-  mat <- (df[, log2fccols] < -0.5) & (df[, padjcols] < 0.05)
-}
-colnames(mat) <- mutants
-
-fit <- euler(mat)
-
-svg(snakemake@output[[1]])
-plot(fit,
-     alpha = 0.7,
-     fills = list(fill = c("#009292", "#FFB6DB", "#B66DFF", "#6DB6FF")),
-     quantities = list(cex=2.0),
-     labels=list(cex=2.5))  # cex is the font size
-dev.off()
+plt.savefig(snakemake.output.down)

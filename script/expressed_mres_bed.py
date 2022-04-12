@@ -5,21 +5,19 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 from matplotlib.colors import hsv_to_rgb, rgb_to_hsv
-from pybedtools import BedTool
-from tqdm.contrib.concurrent import process_map
-
 from moritzsphd.data import grc_seqs, mirbase_seqs
 from moritzsphd.external.heap_ago2 import (bed_export_mre_mirnas,
                                            iterate_mirna_seqs, mre_target,
                                            peak_mirnas)
+from pybedtools import BedTool
+from tqdm.contrib.concurrent import process_map
 
 grc_seqs()  # preload chromosomal sequences
 heap_df = pd.read_csv(snakemake.input['heap_peaks'])
 heap_df['seqnames'] = heap_df['seqnames'].str.replace('chr', '')
 
-mirna_df = pd.read_csv(snakemake.input['mirna_data'], header=[0, 1], index_col=0)
-mirna_expr = mirna_df[('WT', 'Expression')]
-mirnas = mirna_expr.index[mirna_expr > snakemake.params['min_mirna_expression']]
+mirna_loading = pd.read_excel(snakemake.input['mirna_data'], skiprows=2, index_col=0)[['RIP_AGO2', 'RIP_AGO1']].mean(axis=1)
+mirnas = mirna_loading.index[mirna_loading > snakemake.params['mirna_threshold']]
 
 db = gffutils.FeatureDB(snakemake.input.annotation, keep_order=True)
 
@@ -40,7 +38,7 @@ df = pd.concat(results, axis=1, keys=[s.name for s in results], names=['gene_id'
 
 # add missing zic2 peak (see [[file:~/wiki/gtd/reviews.org :ID:       4e989730-755c-4d9b-820b-f38651fe2f1f]])
 zic2_mres = peak_mirnas({'seqnames': '14', 'start': 122479850, 'end': 122480330, 'strand': '.', 'score': -1},
-                        min_mirna_expression=snakemake.params['min_mirna_expression'])
+                        min_mirna_expression=snakemake.params['mirna_threshold'])
 zic2_df = pd.DataFrame(zic2_mres)
 zic2_df['gene_id'] = 'ENSMUSG00000061524'
 zic2_df['is_cds'] = False
@@ -51,7 +49,7 @@ zic2_df = zic2_df.loc[zic2_df.mre_type != '6mer']
 
 df = pd.concat((df, zic2_df)).reset_index(drop=True)
 df['strand'] = df['mre_type'].apply({'7merA1': '+', '8mer': '.', '7merm8': '-'}.get)
-df['score'] = df['mirna'].apply(mirna_expr.get)
+df['score'] = df['mirna'].apply(mirna_loading.get)
 df = df.groupby(['chr', 'start', 'end', 'mre_type', 'strand', 'offset']).agg({
     'score': np.sum,
     'mirna': lambda mres: 'miR-' + '/'.join([mre.lstrip('mmu-').lstrip('-miR') for mre in mres]),
@@ -61,8 +59,8 @@ df['score'] = np.log2(df['score'])
 
 cmap = sns.color_palette("flare", as_cmap=True)
 
-min_color = np.log2(snakemake.params['min_mirna_expression'])
-max_color = np.log2(mirna_expr.max())
+min_color = np.log2(snakemake.params['mirna_thre'])
+max_color = np.log2(mirna_loading.max())
 # BedTool.from
 mre_bt = BedTool.from_dataframe(df.reset_index()[['chr', 'start', 'end', 'index']])
 heap_bt = BedTool.from_dataframe(heap_df[['seqnames', 'start', 'end', 'name']])

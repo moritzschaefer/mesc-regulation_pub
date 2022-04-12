@@ -11,11 +11,14 @@ rule ma_plots:
     script: '../script/ma_plots.py'
 
 rule misregulation_overlap_plots:
-    input: 'output/mrna_data_{subset}.csv'
-    output: 'plot/overlaps_{subset}_{direction}.svg',
+    input:
+        mrna_data='output/mrna_data_{subset}.csv'
+    output:
+        up='plot/overlap_{subset}_up.svg',
+        down='plot/overlap_{subset}_down.svg',
     params:
         log2fc_threshold=config['log2fc_threshold'],
-        padj_threshold=config['padj_threshold'],
+        combined_padj_threshold=config['combined_padj_threshold'],
         mutants=config['full_effect_mutants']
     conda: '../env/python.yaml'
     script: '../script/misregulation_overlap_plots.py'
@@ -44,26 +47,6 @@ rule mrna_pca_plot:
     conda: '../env/python.yaml'
     output: 'plot/mrna_pca.{ext}'
     script: '../script/mrna_pca_plot.py'
-
-rule mirna_pca_plot:
-    input:
-        mirna_data='output/TableS2_sRNA-seq.xlsx'
-    params:
-        samples=FULL_EFFECT_WT_SAMPLES,
-        sample_colors=config['sample_colors']
-    conda: '../env/python.yaml'
-    output: 'plot/mirna_pca.{ext}'
-    script: '../script/mirna_pca_plot.py'
-
-rule mirna_cdf_plot:
-    input:
-        'output/mirna_data.csv'
-    params:
-        mutants=config['full_effect_mutants'],
-        sample_colors=config['sample_colors']
-    conda: '../env/python.yaml'
-    output: 'plot/mirna_cdf.{ext}'
-    script: '../script/mirna_cdf_plot.py'
 
 
 # Correlation plot

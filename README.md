@@ -33,6 +33,6 @@ snakemake -j 4 figure1
 
 ## Additional information
 
-- To generate the genome track plots from figure 2, please manually fill the `file =` paths in misc/tracks_manual.ini
-- The TPM calculation *ignores* mean fragment length, because the resulting TPM read counts wouldn't correspond to log2FCs from DESeq2 anymore. This is somewhat inaccurate but it is the most practical solution.
+- To generate the genome track plots from figure 2 (and figure 4 for Tfap4), please manually fill the `file =` paths in misc/tracks_manual.ini and mesc_tfap4_tracks.ini
+- The TPM calculation *ignores* mean fragment length, because the resulting TPM read counts wouldn't correspond to log2FCs from DESeq2 anymore. This was the most practical solution.
 - snakePipes' mRNA-seq pipeline was used to generate read count tables and DEG analyses
