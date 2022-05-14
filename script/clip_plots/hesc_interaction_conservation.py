@@ -112,15 +112,17 @@ df['log_human_peak_size'] = np.log2(df['human_peak_size'] + 1)
 non_expressed_mirna_peaks = df.loc[df['human_mirna_family_cpm'] == 0, 'log_human_peak_size']
 expressed_mirna_peaks = df.loc[df['human_mirna_family_cpm'] > 10, 'log_human_peak_size']
 # enrichment-control
-fig, ax = plt.subplots(figsize=(1, 4))
+fig, ax = plt.subplots(figsize=(0.7, 1.5))
 
-pd.DataFrame({'non-expressed human miRNAs': 100 * (non_expressed_mirna_peaks > 0).value_counts() / len(non_expressed_mirna_peaks),
-                'expressed human miRNAs': 100 *(expressed_mirna_peaks > 0).value_counts() / len(expressed_mirna_peaks)}).loc[True].plot.bar(color='black')
-ax.set_ylabel('% of human-conserved interactions with CLIP-seq reads')
+pd.DataFrame({'human miRNA-expr. = 0': 100 * (non_expressed_mirna_peaks > 0).value_counts() / len(non_expressed_mirna_peaks),
+              'human miRNA-expr > 10': 100 * (expressed_mirna_peaks > 0).value_counts() / len(expressed_mirna_peaks)}).loc[True].plot.bar(color='black')
+ax.set_xticklabels(ax.get_xticklabels(), rotation=55, ha='right')
+ax.set_ylabel('conserved MREs with CLIP-reads (%)')
+# plt.tight_layout()
 fig.savefig(snakemake.output['mirna_expr_clip_conservation'])
 
 # correlation:
-fig, ax = plt.subplots(figsize=(3, 4))
+fig, ax = plt.subplots(figsize=(2.5, 2))
 
 pos_peaks = expressed_mirna_peaks = df.loc[(df['human_mirna_family_cpm'] > 10) & (df['human_peak_size'] > 0), ['human_mirna_family_cpm', 'human_peak_size']]
 sns.regplot(data=np.log10(pos_peaks), x='human_mirna_family_cpm', y='human_peak_size', ax=ax, scatter_kws={'s': 5}, color='black')
@@ -130,4 +132,5 @@ ax.set_xticklabels([f'{int(10**x)}' for x in ax.get_xticks()])
 ax.set_yticks([0, 1, 2, 3])
 ax.set_yticklabels([f'{int(10**x)}' for x in ax.get_yticks()])
 print(f"Pearson correlation coefficient: {pearsonr((pos_peaks)['human_mirna_family_cpm'], (pos_peaks)['human_peak_size'])[0]:.3}")  # similar value for np.log2..
+plt.tight_layout()
 fig.savefig(snakemake.output['mirna_expr_clip_correlation'])

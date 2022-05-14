@@ -62,7 +62,7 @@ rule cluster_ko_supp_table:
 rule cluster_mir290_targets_supp_table:
     input:
         mir_cluster_des='output/cluster_kos/TableS6_miR-290-295KO_Quant-seq.xlsx',
-        interactions='output/TableS3_Integrative_analysis.xlsx',
+        interactions='output/mirnas/interaction_ranking_all.csv',
         tf_annotation='output/tf_annotation.csv',
     output:
         supp_table='output/cluster_kos/SuppTable_mir290_targets.xlsx',

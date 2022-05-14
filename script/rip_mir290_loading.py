@@ -12,12 +12,12 @@ mutant = 'miR-290-295'
 mirna_id = mutant[3:mutant.find('_')] if '_' in mutant else mutant[4:7]
 target_cluster = [c for c in clusters if f'mmu-miR-{mirna_id}-3p' in c or f'mmu-miR-{mirna_id}a-3p' in c][0]
 
-fig, ax = plt.subplots(figsize=(6, 6))
+fig, ax = plt.subplots(figsize=(3.5, 3.5))
 
 # plt.plot([0, df[['WT_1', 'WT_2']].max().max()], [0, df[['WT_1', 'WT_2']].max().max()], color='gray')
 df['mirna_group'] = 'other'
 df.loc[df.index.intersection(target_cluster), 'mirna_group'] = 'miR-290-295'
-plt.plot([0, df[['RIP_AGO2', 'RIP_AGO1']].max().max()], [0, df[['RIP_AGO2', 'RIP_AGO1']].max().max()], color='gray') # TODO yes/no?
+ax.plot([1, df[['RIP_AGO2', 'RIP_AGO1']].max().max()], [1, df[['RIP_AGO2', 'RIP_AGO1']].max().max()], color='gray')
 ax = sns.scatterplot(data=df.sort_values('mirna_group', ascending=False), x='RIP_AGO2', y='RIP_AGO1', hue='mirna_group', palette='pastel', s=50)
 txts = []
 for mirna in target_cluster:
@@ -26,11 +26,11 @@ for mirna in target_cluster:
     except KeyError:
         pass
 
-plt.xscale('log')
-plt.yscale('log')
+ax.set_xscale('log')
+ax.set_yscale('log')
 sns.despine()
 adjust_text(txts, arrowprops=dict(arrowstyle="->", color='black', lw=0.5))
-plt.yticks([10, 1000, 100000])
-_ = plt.xticks([10, 1000, 100000])
+ax.set_yticks([10, 1000, 100000])
+ax.set_xticks([10, 1000, 100000])
 
 plt.savefig(snakemake.output[0])

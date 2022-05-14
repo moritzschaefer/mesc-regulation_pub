@@ -11,7 +11,7 @@ sidf *= 1e6/sidf.sum()  # CPM normalization
 mir290de = pd.read_excel(snakemake.input['cluster_ko'], sheet_name='Main', skiprows=,, index_col=[0, 1], header=[0, 1]).xs('miR-290-295', axis=1, level=0).droplevel(level=1, axis=0)
 mir290de = mir290de.loc[[gn2id(g) for g in snakemake.params['genes']], ['log2FoldChange']]
 
-fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(4.7, 2.3), gridspec_kw={'width_ratios': [1, 5]}, sharey=True)
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(3.5, 1.7), gridspec_kw={'width_ratios': [1, 5]}, sharey=True)
 cbar_ax = fig.add_axes([.91, .3, .03, .4])
 
 # ax1 =  # plot here somehow the upregulation in miR290

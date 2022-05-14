@@ -20,7 +20,7 @@ ribo_selection = ribo_log2fc.reindex(mirna_targets.index)
 intersection_size = len(ribo_log2fc.index.intersection(mirna_targets.index))
 log.write(f'{intersection_size} of {len(mirna_targets)} miRNA targets have been observed in Ribo-seq ({round(100.0 * intersection_size / len(mirna_targets))}%)\n')
 
-fig, ax = plt.subplots(figsize=(5, 3.3))
+fig, ax = plt.subplots(figsize=(3.5, 2.5))
 # ax.grid(True)
 ax.axhline(y=0.5, color='gray')
 ax.axvline(x=0, color='gray')

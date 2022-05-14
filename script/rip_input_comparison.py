@@ -12,17 +12,17 @@ df = pd.read_excel(snakemake.input['mirna_data'], skiprows=2, index_col=0)
 
 degs = pd.read_excel(snakemake.input['mirna_data'], skiprows=2, index_col=0, sheet_name='Differential loading')
 
-fig, ax = plt.subplots(figsize=(6, 6))
+fig, ax = plt.subplots(figsize=(2.3, 2.3))
 
 df['differential'] = 'non-significant'
 df.loc[df.index.intersection(degs.index[degs.padj < snakemake.params['padj_threshold']]), 'differential'] = 'significant'
 df['Agos_RIP_mean'] = (df['RIP_AGO2'] + df['RIP_AGO1']) / 2
-sns.scatterplot(data=df.sort_values('differential', ascending=False), x='Agos_RIP_mean', hue='differential', y='Input', palette='pastel', s=50, color='black', ax=ax)
+sns.scatterplot(data=df.sort_values('differential', ascending=False), x='Agos_RIP_mean', hue='differential', y='Input', palette={'significant': '#E9967a', 'non-significant': 'black'}, s=25, color='black', ax=ax, rasterized=True)
 
 plt.xscale('log')
 plt.yscale('log')
 sns.despine()
-plt.yticks([10, 1000, 100000])
-plt.xticks([10, 1000, 100000])
+plt.yticks([1, 100, 10000])
+plt.xticks([1, 100, 10000])
 
 plt.savefig(snakemake.output[0])

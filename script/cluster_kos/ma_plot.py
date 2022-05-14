@@ -7,7 +7,7 @@ from moritzsphd.plot import maplot
 group = snakemake.wildcards['group']
 
 palette = {'up': '#a00000', 'down': '#36648b', 'unchanged': 'darkgray'}
-fig, ax = plt.subplots(figsize=(4.7, 3.2))
+fig, ax = plt.subplots(figsize=(3.5, 2.0))
 
 # expr = pd.read_csv(snakemake.input['expr'], sep='\t', index_col=0)
 # expr *= (1e/expr.sum())

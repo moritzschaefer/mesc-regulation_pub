@@ -19,7 +19,8 @@ rule misregulation_overlap_plots:
     params:
         log2fc_threshold=config['log2fc_threshold'],
         combined_padj_threshold=config['combined_padj_threshold'],
-        mutants=config['full_effect_mutants']
+        mutants=config['full_effect_mutants'],
+        mutant_colors=[config['sample_colors'][s] for s in config['full_effect_mutants']]
     conda: '../env/python.yaml'
     script: '../script/misregulation_overlap_plots.py'
 

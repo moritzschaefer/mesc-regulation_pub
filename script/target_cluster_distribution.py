@@ -51,7 +51,7 @@ cluster_target_counts['other'] = cluster_target_counts.sum() - cluster_target_co
 df['Interaction count'] = cluster_target_counts.loc[df.index]
 
 # ** Pie plots **
-fig, axes = plt.subplots(1, 2, figsize=(10, 10))
+fig, axes = plt.subplots(1, 2, figsize=(3.5, 3.5))
 cluster_color_order = []
 # gist_earth ar terrain
 cmap = sns.color_palette('flare', num_clusters+3, as_cmap=True)
@@ -91,7 +91,7 @@ plt.savefig(snakemake.output['pieplot'])
 plotdf = df.iloc[:-1]  # drop "other" cluster
 plotdf['Target count'] = target_list.groupby('cluster')['Geneid'].nunique()
 width = 0.27
-fig, ax1 = plt.subplots(figsize=(5, 5))
+fig, ax1 = plt.subplots(figsize=(2.2, 2.3))
 ax2 = ax1.twinx()
 colors = ['#696969', '#6ca6cd']
 # colors = ['#696969', '#8b0000', '#ffffff']

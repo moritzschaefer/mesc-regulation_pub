@@ -8,17 +8,17 @@ mir295mirnas = [c for c in clusters if 'mmu-miR-295-5p' in c][0]
 mir290de = pd.read_excel(snakemake.input['supp_table'])
 df = pd.read_csv(snakemake.input['interaction_ranking'])
 df = df[df['miRNA'].isin(mir295mirnas) & df['is_tf']]
-positives = mir290de.loc[(mir290de['miR-290-295_KO log2FC'] > snakemake.params['log2fc_threshold']) & (mir290de['miR-290-295_KO padj'] < snakemake.params['padj_threshold'])]
+upregulated = mir290de.loc[(mir290de['miR-290-295_KO log2FC'] > snakemake.params['log2fc_threshold']) & (mir290de['miR-290-295_KO padj'] < snakemake.params['padj_threshold'])]
 
-df = df[df.Geneid.isin(positives['Geneid'])]
+df = df[df.Geneid.isin(upregulated['Geneid'])]
 
 metrics = df.groupby('Gene name')['Interaction score'].agg(['max', 'size', 'mean'])
-metrics['miR-290-295 log2FC'] = positives.set_index('Gene name')['miR-290-295_KO log2FC']
-x = 'Number of targeting miR-290-295-miRNAs'
-y = 'Maximum interaction score'
+metrics['miR-290-295 log2FC'] = upregulated.set_index('Gene name')['miR-290-295_KO log2FC']
+x = 'Number of targeting miR-290-295 BS'
+y = 'Max. interaction score'
 hue = 'score mean'
 metrics.rename(columns={'size': x, 'max': y, 'mean': hue}, inplace=True)
-fig, ax = plt.subplots(figsize=(6, 4))
+fig, ax = plt.subplots(figsize=(2.9, 1.8))
 
 ax = sns.scatterplot(data=metrics, y=y, x=x, size=hue, hue=hue, ax=ax)
 ax.set_xlabel(x)

@@ -111,14 +111,14 @@ rule plot_target_track:
     conda:
         "../env/python.yaml"
     shell: '''
-        pyGenomeTracks --tracks {input.tracks} --region {params.region} --outFileName {output} --plotWidth 20 --trackLabelFraction '0.0'
+        pyGenomeTracks --tracks {input.tracks} --region {params.region} --outFileName {output} --plotWidth 17 --trackLabelFraction '0.0'
     '''
 
 rule plot_target_mirna_expr:
     input:
         mirna_data='output/TableS2_RIP-seq.xlsx',
         interaction_data='output/mirnas/interaction_ranking_all.csv',
-        unfiltered_interaction_data='output/mirnas/unfiltered_interaction_ranking_all.csv'
+        unfiltered_interaction_data='output/mirnas/unfiltered_interaction_ranking_all.csv',
     output:
         'plot/target_data/mirna_expr_{gene}.pdf'
     params:
@@ -167,11 +167,13 @@ rule plot_target_mirna_expr:
 
 rule plot_target_log2fc:
     input:
-        mrna_data='output/mrna_data_all.csv'
+        mrna_data='output/mrna_data_all.csv',
+        mir290_diffexp='output/cluster_kos/TableS6_miR-290-295KO_Quant-seq.xlsx',
     params:
         vmin=-1.5,
         vmax=1.5,
-        full_effect_mutants=config['full_effect_mutants']
+        full_effect_mutants=config['full_effect_mutants'],
+        plot_mir290=False
     output:
         'plot/target_data/target_log2fc_{gene}.pdf',
     run:
@@ -186,12 +188,17 @@ rule plot_target_log2fc:
         norm = mpl.colors.Normalize(vmin=params['vmin'], vmax=params['vmax'])
 
         mrna_df = pd.read_csv(input['mrna_data'], header=[0, 1], index_col=[0, 1])
-        log2fc = mrna_df.xs('log2FoldChange', axis=1, level=1).droplevel(level=0)[params['full_effect_mutants']]
+        log2fc = mrna_df.xs('log2FoldChange', axis=1, level=1)[params['full_effect_mutants']]
         log2fc.columns = ['Drosha_KO', 'Dicer_KO', 'Ago2&1_KO']
 
-        gene_data = log2fc.loc[wildcards['gene']]
+        if params['plot_mir290']:
+            mir290_de = pd.read_excel(input['mir290_diffexp'], sheet_name='Main', skiprows=2, index_col=[0, 1], header=[0, 1])
+            mir290_de = mir290_de.xs('miR-290-295', axis=1, level=0)
+            log2fc['miR-290-295_KO'] = mir290_de['log2FoldChange']
+
+        gene_data = log2fc.droplevel(level=0).loc[wildcards['gene']]
         color_list = cmap(norm(gene_data.values))
-        fig, ax = plt.subplots(figsize=(2, 2))
+        fig, ax = plt.subplots(figsize=(1.2 + (0.3 * params['plot_mir290']), 1.7))
 
         gene_data.plot.bar(color=color_list, ax=ax)
         ax.set_xticklabels(ax.get_xticklabels(), rotation=45, ha='right')

@@ -6,7 +6,7 @@ df = pd.read_excel(snakemake.input['mirna_data'], skiprows=2, index_col=0)
 
 # df = np.log2(df+1)
 
-fig, ax = plt.subplots(figsize=(4, 4))
+fig, ax = plt.subplots(figsize=(3.5, 3.5))
 
 ax.plot([0, df[['RIP_AGO2', 'RIP_AGO1']].max().max()], [0, df[['RIP_AGO2', 'RIP_AGO1']].max().max()], color='gray')
 sns.scatterplot(data=df, x='RIP_AGO1', y='RIP_AGO2', color='black')

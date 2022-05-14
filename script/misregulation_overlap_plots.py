@@ -14,18 +14,20 @@ log2fc = df.xs('log2FoldChange', axis=1, level=1)
 mutants = snakemake.params.mutants
 
 # up
+fig, ax = plt.subplots(1, 1, figsize=(1.7, 2))
 ups = ((padj < snakemake.params['combined_padj_threshold']) & (log2fc > snakemake.params['log2fc_threshold']))
 up_sets = [set(ups.index[ups[mutant]]) for mutant in mutants]
-c = venn3(up_sets, mutants)
-plt.savefig(snakemake.output.up)
+c = venn3(up_sets, mutants, ax=ax, set_colors=snakemake.params.mutant_colors)
+fig.savefig(snakemake.output.up)
 # c.get_patch_by_id('11').set_color('magenta')
 # c.get_patch_by_id('11').set_edgecolor('none')
 # c.get_patch_by_id('11').set_alpha(0.4)
-plt.subplots()
+
 
 # down
+fig, ax = plt.subplots(1, 1, figsize=(1.7, 2))
 downs = ((padj < snakemake.params['combined_padj_threshold']) & (log2fc < snakemake.params['log2fc_threshold']))
 down_sets = [set(downs.index[downs[mutant]]) for mutant in mutants]
-c = venn3(down_sets, mutants)
+c = venn3(down_sets, mutants, ax=ax, set_colors=snakemake.params.mutant_colors)
 
-plt.savefig(snakemake.output.down)
+fig.savefig(snakemake.output.down)

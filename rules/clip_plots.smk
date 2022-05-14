@@ -7,6 +7,7 @@ rule mesc_tfap4_genome_track:
         tracks='misc/mesc_tfap4_tracks.ini',
         clip_track='misc/bosson_tagged_Ago2_iCLIP.bw.mm10',
         heap_track='output/track_plots/heap_peaks.bed',
+        expressed_mers='output/track_plots/expressed_mres.bed'
     output:
         'plot/mesc_tfap4_track.pdf',
     shell: '''
@@ -15,7 +16,7 @@ rule mesc_tfap4_genome_track:
 
 rule download_annotation:
     input:
-        HTTP.remote('https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_29/gencode.v29.annotation.gtf.gz')
+        HTTP.remote('https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_29/gencode.v29.annotation.gtf.gz', static=True)
     output:
         'misc/human_anno.gtf'
     shell: '''
@@ -37,7 +38,7 @@ rule hesc_tfap4_genome_track:
     output:
         'plot/hesc_clip_tfap4_track.pdf',
     shell: '''
-    pyGenomeTracks --tracks {input.tracks} --region 16:4256965-4258280 --outFileName {output} --plotWidth 20 --trackLabelFraction '0.0'
+    pyGenomeTracks --tracks {input.tracks} --region 16:4256965-4258280 --outFileName {output} --plotWidth 15 --trackLabelFraction '0.0'
     '''
 
 rule hesc_interaction_conservation:

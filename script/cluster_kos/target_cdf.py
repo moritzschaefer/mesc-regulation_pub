@@ -9,8 +9,8 @@ from scipy.stats import kstest
 
 clusters = mirbase_clusters()
 
-fig, ax = plt.subplots(figsize=(5.2, 3.2))
-fig2, ax2 = plt.subplots(figsize=(5.2, 3.2))
+fig, ax = plt.subplots(figsize=(3.0, 2.0))
+fig2, ax2 = plt.subplots(figsize=(3.0, 2.0))
 
 # controls = []
 

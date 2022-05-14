@@ -26,7 +26,7 @@ ago2_genes = set(ago2_heap_data['gene_id'].unique()) & expressed_genes
 
 ts_predictions = ts_predictions.loc[ts_predictions.Geneid.isin(up_genes.get_level_values(0))]
 
-plt.subplots(figsize=(6, 6))
+plt.subplots(figsize=(3.5, 3.5))
 venn3([set(up_genes.get_level_values(0)), ts_genes, ago2_genes], ['Up-regulated genes', 'TS- predicted genes', 'AGO2-binding genes'])
 plt.tight_layout()
 plt.savefig(snakemake.output['overlap_plot'])

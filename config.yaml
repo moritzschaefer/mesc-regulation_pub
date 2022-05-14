@@ -83,7 +83,7 @@ target_params:
   Prr13:   # positive example
     chr: '15'
     start: 102462100
-    end: 102462940
+    end: 102462840
     strand: '+'
   Axin2:   # negative example
     chr: '11'

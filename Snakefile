@@ -57,18 +57,18 @@ rule rnai_read_count_matrix:
         df = pd.read_csv(input[0], sep='\t', index_col=0)
         df[params['samples']].to_csv(output[0], sep='\t')
 
-# Combine the RNA-seq
-rule combine_mrna_data:
-    input:
-        tpm_expression='output/all.tpm.tsv',
-        diffexp=[remote_file(config['mrna_diffexp_path'].format(sample=mutant)) for mutant in config['full_effect_mutants']]
-    params:
-        mutants=config['full_effect_mutants']
-    conda: 'env/python.yaml'
-    output:
-        csv='output/mrna_data_all.csv',
-        supp_table='output/TableS1_RNA-seq_rna_seq.xlsx',
-    script: 'script/combine_mrna_data.py'
+# Combine the RNA-seq data. commented, because this data is imported from supp. table
+# rule combine_mrna_data:
+#     input:
+#         tpm_expression='output/all.tpm.tsv',
+#         diffexp=[remote_file(config['mrna_diffexp_path'].format(sample=mutant)) for mutant in config['full_effect_mutants']]
+#     params:
+#         mutants=config['full_effect_mutants']
+#     conda: 'env/python.yaml'
+#     output:
+#         csv='output/mrna_data_all.csv',
+#         supp_table='output/TableS1_RNA-seq_rna_seq.xlsx',
+#     script: 'script/combine_mrna_data.py'
 
 rule filter_protein_coding:
     '''

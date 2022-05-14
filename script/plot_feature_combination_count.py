@@ -28,10 +28,10 @@ try:
     ax = axes['intersections']
     if snakemake.wildcards['direction'] == '_vertical':
         ax.set_xlabel('Detected miRNA targets')
-        ax.set_xscale('log', basex=10)
+        ax.set_xscale('log', base=10)
     else:
         ax.set_ylabel('Detected miRNA targets')
-        ax.set_yscale('log', basey=10)
+        ax.set_yscale('log', base=10)
     plt.tight_layout()
 
     plt.savefig(snakemake.output[0])

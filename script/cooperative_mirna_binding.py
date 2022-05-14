@@ -44,7 +44,7 @@ gene_interaction_counts['mean_heap_signal_score'] = heap_df.groupby('gene_id')['
 
 interactions = pd.read_csv(snakemake.input.interaction_ranking)
 
-fig, ax = plt.subplots(figsize=(2, 5))
+fig, ax = plt.subplots(figsize=(1.5, 2.7))
 
 ts_bin_thres = snakemake.params['ts_mre_count_bins'] + [gene_interaction_counts['num_ts_interactions'].max()+1]
 ts_gene_groups = {f'{b1}-{b2-1}': gene_interaction_counts.index[(gene_interaction_counts.num_ts_interactions >= b1) & (gene_interaction_counts.num_ts_interactions < b2)]
@@ -53,7 +53,7 @@ ts_gene_groups = {f'{b1}-{b2-1}': gene_interaction_counts.index[(gene_interactio
 # group
 gene_interaction_counts['interaction_count'] = gene_interaction_counts.index.map(lambda gid: [i for i, g in ts_gene_groups.items() if gid in g][0])
 
-sns.boxplot(data=gene_interaction_counts, x='interaction_count', y='num_heap_peaks', order=ts_gene_groups.keys(), ax=ax)
+sns.boxplot(data=gene_interaction_counts, x='interaction_count', y='num_heap_peaks', order=ts_gene_groups.keys(), ax=ax, color='gray')
 ax.set_ylim([0, 15])
 _ = ax.set_xticklabels(ax.get_xticklabels(), rotation=30, ha='right')
 fig.savefig(snakemake.output.heap_for_num_mres)
@@ -66,7 +66,6 @@ interaction_count = interactions.groupby('Geneid').apply(len)
 ribo_df = pd.read_excel(snakemake.input['ribo_data'], index_col=[0, 1], skiprows=2)
 ribo_df.rename(columns={'AGO2&1_log2FC': 'AGO12_log2FC', 'AGO2&1_padj': 'AGO12_padj'}, inplace=True)
 mutants = snakemake.params['mutants']
-import pdb; pdb.set_trace()
 ribo_log2fc = ribo_df[[m.upper() + '_log2FC' for m in mutants]]
 ribo_log2fc.columns = mutants
 ribo_log2fc.reset_index(level=1, inplace=True, drop=True)
@@ -79,18 +78,23 @@ ribo_gene_groups = {f'{b1}-{b2-1}': interaction_count_ribo.index[(interaction_co
                for b1, b2 in zip(bin_thres[:-1], bin_thres[1:])}
 ribo_misreg = ribo_log2fc.loc[interaction_count_ribo.index]
 ribo_misreg['interaction_count'] = ribo_misreg.index.map(lambda gid: [i for i, g in ribo_gene_groups.items() if gid in g][0])
-fig, ax = plt.subplots(figsize=(5, 7))
+fig, ax = plt.subplots(figsize=(3.5, 2.7))
 
 for mutant in mutants:
-    color = snakemake.params.sample_colors[mutant]
-    sns.regplot(x=ribo_misreg[mutant], y=interaction_count_ribo, scatter_kws={'s': 5, 'alpha': 0.5}, color=color, ax=ax, label=f'{mutant}_KO')
+    # color = snakemake.params.sample_colors[mutant]
+    # sns.regplot(x=ribo_misreg[mutant], y=interaction_count_ribo, scatter_kws={'s': 5, 'alpha': 0.5}, color=color, ax=ax, label=f'{mutant}_KO')
     pearsonr(ribo_misreg[mutant], interaction_count_ribo)
-    sns.despine()
+    # sns.despine()
     print(f'{mutant} pearsonr: {pearsonr(ribo_misreg[mutant], interaction_count_ribo)[0]:.2}')
+
+sns.boxplot(data=ribo_misreg.melt(id_vars=['interaction_count'], value_vars=mutants, value_name='log2FC', var_name='mutant'), x='mutant', y='log2FC', hue='interaction_count', ax=ax, hue_order=ribo_gene_groups.keys())
+# ax.set_title('RNAi_KO Ribosome occupancy in function of number of targeting miRNAs')
+sns.despine()
 ax.set_xlabel('Diff. ribosome occupancy (log2FC)')
 ax.set_ylabel('Number of miRNA interations')
 ax.set_title('Number of targeting miRNAs vs. RNAi_KO ribo occupancy for each target')
 ax.legend()
+ax.set_ylim([ax.get_ylim()[0], 4.0])
 fig.savefig(snakemake.output.interaction_count_ribo)
 
 
@@ -108,7 +112,7 @@ cluster_predictions = interactions.loc[interactions['miRNA'].isin(target_cluster
 
 interaction_count_mir290 = cluster_predictions.groupby('Geneid').apply(len)
 
-fig, ax = plt.subplots(figsize=(2, 3))
+fig, ax = plt.subplots(figsize=(1.5, 2.3))
 
 mir290_gene_groups = {f'{b1}-{b2-1}': interaction_count_mir290.index[(interaction_count_mir290 >= b1) & (interaction_count_mir290 < b2)] for b1, b2 in zip(bin_thres[:-1], bin_thres[1:])}
 
@@ -119,4 +123,7 @@ sns.boxplot(data=mir290_misreg, x='interaction_count', y='log2FoldChange', order
 sns.despine()
 ax.set_title('miR-290 targets in miR-290_KO')
 _ = ax.set_xticklabels(ax.get_xticklabels(), rotation=30, ha='right')
+
+ax.set_ylim([ax.get_ylim()[0], 2.0])
+plt.tight_layout()
 fig.savefig(snakemake.output.interaction_count_mir290)

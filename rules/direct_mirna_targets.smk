@@ -113,6 +113,42 @@ rule filter_esc_specific:
     conda: '../env/python.yaml'
     script: '../script/filter_esc_specific.py'
 
+rule mirna_target_genes:
+    input:
+        'output/mirnas/interaction_ranking_grouped_all.csv'
+    output:
+        'output/mirnas/mirna_target_genes.txt'
+    run:
+        import pandas as pd
+        with open(output[0], 'w') as f:
+            f.write(','.join(pd.read_csv(input[0])['Geneid'].values))
+
+
+GSEA_LIBRARIES = ['WikiPathways_2019_Mouse',
+                  'GO_Biological_Process_2021',
+                  'GO_Molecular_Function_2021',
+                  'GO_Cellular_Component_2021',
+                  'BioPlanet_2019',
+                  'KEGG_2019_Mouse']
+rule mirna_target_enrichment_analysis:
+    input:
+        libraries=expand('misc/{library}.gmt', library=GSEA_LIBRARIES),
+        gene_sets=['output/mirnas/mirna_target_genes.txt',
+                   'output/up_genes_all.txt',
+                   'output/down_genes_all.txt'],
+        enrichments=['output/direct_mirna_target_enrichment_all.csv',
+                     'output/up_genes_enrichment_all.csv',
+                     'output/down_genes_enrichment_all.csv'],
+        human_mouse_trans='misc/human_mouse_trans.tsv'
+    output:
+        data='output/mirna_target_enrichment_analysis.csv',
+        plot='plot/mirna_target_enrichment_analysis.svg'
+    params:
+        gene_set_labels=['miRNA target genes', 'Upregulated genes', 'Downregulated genes'],
+        gsea_libraries=GSEA_LIBRARIES
+    conda: '../env/python.yaml'
+    script: '../script/mirna_target_enrichment_analysis.py'
+
 rule analyze_direct_mirna_targets:
     '''
     Here we analyze direct miRNA targets.
@@ -124,10 +160,26 @@ rule analyze_direct_mirna_targets:
         enrichment_table="output/direct_mirna_target_enrichment_{subset}.csv",
         enrichment_plot="plot/direct_mirna_target_enrichment_{subset}.svg",
     params:
-        filter_padj=0.01
+        filter_padj=0.001,
+        column='Gene name'
     conda: '../env/python.yaml'
     script: '../script/enrichment_analysis.py'
 
+rule analyze_updown_genes:
+    '''
+    Here we analyze direct miRNA targets.
+    This mostly involves a GO analysis
+    '''
+    input:
+        'output/{direction}_genes_{subset}.txt',
+    output:
+        enrichment_table="output/{direction}_genes_enrichment_{subset}.csv",
+        enrichment_plot="plot/{direction}_genes_enrichment_{subset}.svg",
+    params:
+        filter_padj=0.001,
+        column=None
+    conda: '../env/python.yaml'
+    script: '../script/enrichment_analysis.py'
 
 rule ribo_seq_validation_supptable:
     input:
@@ -235,6 +287,7 @@ rule database_overlap:
 rule interaction_stats:
     input:
         interaction_ranking='output/mirnas/interaction_ranking_all.csv',
+        mrna_data='output/mrna_data_all.csv',
     output:
         interaction_histo='plot/interaction_count_histo.svg',
         gene_expression='plot/interaction_count_gene_expr.svg',

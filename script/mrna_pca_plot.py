@@ -6,7 +6,7 @@ from moritzsphd.plot import pcaplot
 
 counts = pd.read_csv(snakemake.input['expression'], sep='\t', index_col=0)
 counts *= (1e6/counts.sum())
-fig, ax = plt.subplots(figsize=(6, 3.5))
+fig, ax = plt.subplots(figsize=(3.5, 2.0))
 
 sorted_colors = [snakemake.params['sample_colors'][m[:m.find('_')]]
                  for m in snakemake.params['samples']]

@@ -16,7 +16,7 @@ mir290de_genes.loc[mir290de_genes.index.isin(mir290_targets) & (mir290de_genes.l
 genes = snakemake.params['genes']
 out = []
 acceptance_factor = snakemake.params['acceptance_factor']
-fig, axes = plt.subplots(1, len(genes), figsize=(4 * len(genes), 4), sharey=True, squeeze=False)
+fig, axes = plt.subplots(1, len(genes), figsize=(3.5 * len(genes), 3.5), sharey=True, squeeze=False)
 
 mir290de_genes.rename(columns={'log2FoldChange': 'miR290KO log2FC'}, inplace=True)
 #skiprows=2 is relevant if the xlsx got beautified (for publication)

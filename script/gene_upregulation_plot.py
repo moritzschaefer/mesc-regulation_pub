@@ -28,7 +28,7 @@ for max_padj, min_up in itertools.product(max_padjs, min_ups):
 
 plot_df.columns = [str(v) for v in plot_df.columns]
 plot_df.index = [str(v) for v in plot_df.index]
-fig, ax = plt.subplots(figsize=(4.2, 3.5))
+fig, ax = plt.subplots(figsize=(3.5, 3.0))
 cmap = sns.color_palette("flare", as_cmap=True)
 sns.heatmap(plot_df, annot=True, fmt='.0f', cmap=cmap, ax=ax, vmin=0)
 ax.set_xlabel(f'{direction.title()}regulated in at least <x> mutants')

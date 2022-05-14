@@ -59,7 +59,7 @@ df['score'] = np.log2(df['score'])
 
 cmap = sns.color_palette("flare", as_cmap=True)
 
-min_color = np.log2(snakemake.params['mirna_thre'])
+min_color = np.log2(snakemake.params['mirna_threshold'])
 max_color = np.log2(mirna_loading.max())
 # BedTool.from
 mre_bt = BedTool.from_dataframe(df.reset_index()[['chr', 'start', 'end', 'index']])
@@ -79,7 +79,7 @@ def _color(row):
     #     hsv[2] = min(0.35 + hsv[2], 1.0)  # make it lighter to indicate it's not within a HEAP peak
     #     col = hsv_to_rgb(hsv)
 
-    return ','.join([str(int(v*255)) for v in col])
+    return ','.join([str(min(255, max(0, int(v*255)))) for v in col])
 
 
 df['color'] = df.apply(_color, axis=1)

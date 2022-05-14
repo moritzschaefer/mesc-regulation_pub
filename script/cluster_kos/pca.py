@@ -28,7 +28,7 @@ elif snakemake.wildcards['subset'] != 'all':
     raise ValueError('value for subset-wildcard is not supported')
 df *= (1e6/df.sum())  # CPM normalization
 
-fig, ax = plt.subplots(figsize=(6, 3.5))
+fig, ax = plt.subplots(figsize=(3.5, 2.0))
 ax, explained_variance = pcaplot(df, scaling='log2', ax=ax, cmap=cmap)
 
 # formatting
