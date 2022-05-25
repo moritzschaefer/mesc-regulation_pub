@@ -85,7 +85,7 @@ for mutant in mutants:
     # sns.regplot(x=ribo_misreg[mutant], y=interaction_count_ribo, scatter_kws={'s': 5, 'alpha': 0.5}, color=color, ax=ax, label=f'{mutant}_KO')
     pearsonr(ribo_misreg[mutant], interaction_count_ribo)
     # sns.despine()
-    print(f'{mutant} pearsonr: {pearsonr(ribo_misreg[mutant], interaction_count_ribo)[0]:.2}')
+    print(f'{mutant} pearsonr: {pearsonr(ribo_misreg[mutant], interaction_count_ribo)}')
 
 sns.boxplot(data=ribo_misreg.melt(id_vars=['interaction_count'], value_vars=mutants, value_name='log2FC', var_name='mutant'), x='mutant', y='log2FC', hue='interaction_count', ax=ax, hue_order=ribo_gene_groups.keys())
 # ax.set_title('RNAi_KO Ribosome occupancy in function of number of targeting miRNAs')
@@ -124,6 +124,7 @@ sns.despine()
 ax.set_title('miR-290 targets in miR-290_KO')
 _ = ax.set_xticklabels(ax.get_xticklabels(), rotation=30, ha='right')
 
+print(f'miR-290-295 targets in miR-290-295_KO pearsonr: {pearsonr(mir290_misreg.log2FoldChange, interaction_count_mir290)}')
 ax.set_ylim([ax.get_ylim()[0], 2.0])
 plt.tight_layout()
 fig.savefig(snakemake.output.interaction_count_mir290)

@@ -141,7 +141,7 @@ rule mirna_target_enrichment_analysis:
                      'output/down_genes_enrichment_all.csv'],
         human_mouse_trans='misc/human_mouse_trans.tsv'
     output:
-        data='output/mirna_target_enrichment_analysis.csv',
+        data='output/mirna_target_enrichment_analysis.xlsx',
         plot='plot/mirna_target_enrichment_analysis.svg'
     params:
         gene_set_labels=['miRNA target genes', 'Upregulated genes', 'Downregulated genes'],
@@ -277,7 +277,8 @@ rule database_overlap:
         mtb_mmu=HTTP.remote('https://mirtarbase.cuhk.edu.cn/~miRTarBase/miRTarBase_2022/cache/download/8.0/mmu_MTI.xls', keep_local=True, static=True),
         mirna_data='output/TableS2_RIP-seq.xlsx',
     output:
-        'plot/mirtarbase_overlap.svg'
+        plot='plot/mirtarbase_overlap.svg',
+        data='output/mirtarbase_overlap.xlsx'
     params:
         mirna_threshold=config['mirna_threshold']
     conda: '../env/python.yaml'

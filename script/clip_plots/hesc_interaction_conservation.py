@@ -1,3 +1,4 @@
+import random
 import re
 
 import matplotlib.pyplot as plt
@@ -9,6 +10,7 @@ import seaborn as sns
 from moritzsphd.data import mirbase_seqs
 from scipy.stats import pearsonr
 
+random.seed(1)
 bw = pyBigWig.open(snakemake.input['hesc_clip_bw'])
 
 # Take our mirna interactions
@@ -96,8 +98,24 @@ def peak_size(gene_id, seed_match):
 
 
 ortholog_df = pd.read_csv(snakemake.input['orthologs'], sep='\t')
-merged = df.reset_index().merge(ortholog_df[['Human gene stable ID', 'Gene stable ID']].rename(columns={'Gene stable ID': 'Geneid'}), on='Geneid', how='inner')
+merged = df.reset_index().merge(ortholog_df[['Human gene stable ID', 'Gene stable ID']].rename(columns={'Gene stable ID': 'Geneid'}).drop_duplicates(), on='Geneid', how='inner')
 peak_sizes = merged.apply(lambda row: peak_size(row['Human gene stable ID'], row['seed_match']), axis=1)
+
+def scramble(word):
+    l = list(word)
+    random.shuffle(l)
+    return ''.join(l)
+scrambled_control = merged.apply(lambda row: peak_size(row['Human gene stable ID'], scramble(row['seed_match'])), axis=1)
+shuffled_control = merged.apply(lambda row: peak_size(row['Human gene stable ID'], random.choice(merged['seed_match'])), axis=1)
+
+fig, ax = plt.subplots(1, 1, figsize=(0.6, 1.5))
+pd.Series(index=['Seed_conserved', 'Seed_shuffled', 'Seed_scrambled'], data=[100 * (l > 0).sum()/len(l) for l in [peak_sizes, shuffled_control, scrambled_control]]).plot.bar(color='black', ax=ax)
+ax.set_ylabel('Percent')
+ax.set_title('Conserved interactions')
+ax.set_xticklabels(ax.get_xticklabels(), rotation=45, ha='right')
+sns.despine()
+fig.savefig(snakemake.output.mre_count_with_clip_reads)
+
 df['human_peak_size'] = peak_sizes.groupby(merged['index']).max()
 
 hesc_mirna_expr = pd.read_excel(snakemake.input['hesc_mirna_expr'], index_col=0, skiprows=1).dropna(how='all')
@@ -113,7 +131,7 @@ non_expressed_mirna_peaks = df.loc[df['human_mirna_family_cpm'] == 0, 'log_human
 expressed_mirna_peaks = df.loc[df['human_mirna_family_cpm'] > 10, 'log_human_peak_size']
 # enrichment-control
 fig, ax = plt.subplots(figsize=(0.7, 1.5))
-
+df.to_excel(snakemake.output['data'])
 pd.DataFrame({'human miRNA-expr. = 0': 100 * (non_expressed_mirna_peaks > 0).value_counts() / len(non_expressed_mirna_peaks),
               'human miRNA-expr > 10': 100 * (expressed_mirna_peaks > 0).value_counts() / len(expressed_mirna_peaks)}).loc[True].plot.bar(color='black')
 ax.set_xticklabels(ax.get_xticklabels(), rotation=55, ha='right')
@@ -122,7 +140,7 @@ ax.set_ylabel('conserved MREs with CLIP-reads (%)')
 fig.savefig(snakemake.output['mirna_expr_clip_conservation'])
 
 # correlation:
-fig, ax = plt.subplots(figsize=(2.5, 2))
+fig, ax = plt.subplots(figsize=(1.8, 2))
 
 pos_peaks = expressed_mirna_peaks = df.loc[(df['human_mirna_family_cpm'] > 10) & (df['human_peak_size'] > 0), ['human_mirna_family_cpm', 'human_peak_size']]
 sns.regplot(data=np.log10(pos_peaks), x='human_mirna_family_cpm', y='human_peak_size', ax=ax, scatter_kws={'s': 5}, color='black')

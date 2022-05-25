@@ -7,7 +7,7 @@ rule mesc_tfap4_genome_track:
         tracks='misc/mesc_tfap4_tracks.ini',
         clip_track='misc/bosson_tagged_Ago2_iCLIP.bw.mm10',
         heap_track='output/track_plots/heap_peaks.bed',
-        expressed_mers='output/track_plots/expressed_mres.bed'
+        expressed_mres='output/track_plots/expressed_mres.bed'
     output:
         'plot/mesc_tfap4_track.pdf',
     shell: '''
@@ -51,7 +51,9 @@ rule hesc_interaction_conservation:
         orthologs='misc/human_mouse_orthologs.tsv',
         hesc_mirna_expr='misc/hinton14_tables2.xlsx'
     output:
+        mre_count_with_clip_reads='plot/clip_plots/mre_count_with_clip_reads.svg',
         mirna_expr_clip_conservation='plot/clip_plots/hesc_clip_conservation.svg',
-        mirna_expr_clip_correlation='plot/clip_plots/hesc_interaction_conservation.svg'
+        mirna_expr_clip_correlation='plot/clip_plots/hesc_interaction_conservation.svg',
+        data='output/hesc_conservation_plot.xlsx'
     script:
         '../script/clip_plots/hesc_interaction_conservation.py'
